@@ -57,7 +57,7 @@ jobs:
       # 6. 테스트 결과를 PR에 표시
       - name: Annotate Test Results
         if: failure()
-        uses: marocchino/sticky-pull-request-comment@v3 # PR에 결과 주석
+        uses: marocchino/sticky-pull-request-comment@v2.9.0 # PR에 결과 주석
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           header: Test Results
@@ -67,7 +67,7 @@ jobs:
 
       - name: Post success comment
         if: success()
-        uses: marocchino/sticky-pull-request-comment@v3
+        uses: marocchino/sticky-pull-request-comment@v2.9.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           header: Test Results
