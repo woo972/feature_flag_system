@@ -2,6 +2,7 @@ package com.featureflag.sdk;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.featureflag.shared.config.JacksonConfig;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.featureflag.sdk.config.FeatureFlagClientConfig;
@@ -11,17 +12,14 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.net.URIBuilder;
-
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import static com.featureflag.shared.config.JacksonConfig.getObjectMapper;
 
 
 public class FeatureFlagClient implements AutoCloseable {
@@ -35,7 +33,6 @@ public class FeatureFlagClient implements AutoCloseable {
     public FeatureFlagClient(FeatureFlagClientConfig config) {
         this.config = config;
         this.httpClient = HttpClients.custom()
-                .setConnectionTimeToLive(config.getConnectTimeoutMs(), TimeUnit.MILLISECONDS)
                 .build();
         this.objectMapper = JacksonConfig.getObjectMapper();
         this.flagCache = Caffeine.newBuilder()

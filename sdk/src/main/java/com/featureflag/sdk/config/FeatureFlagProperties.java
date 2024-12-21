@@ -1,8 +1,5 @@
 package com.featureflag.sdk.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@ConfigurationProperties(prefix = "feature.flag")
 public class FeatureFlagProperties {
     private String baseUrl;
     private String apiKey;

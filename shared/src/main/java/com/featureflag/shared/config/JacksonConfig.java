@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class JacksonConfig {
     private static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
@@ -25,10 +24,7 @@ public class JacksonConfig {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);  // Ignore unknown properties
         mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);  // Allow single values as arrays
         mapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);  // Treat empty strings as null
-        
-        // Register modules
-        mapper.registerModule(new JavaTimeModule());  // Support Java 8 date/time types
-        
+
         return mapper;
     }
 
