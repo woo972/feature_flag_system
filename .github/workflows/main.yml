@@ -31,8 +31,7 @@ jobs:
         uses: actions/setup-java@v4.6.0
         with:
           java-version: '21'
-          distribution: adopt
-          
+          distribution: 'temurin'
       
       - name: Setup Gradle
         uses: gradle/actions@v4.2.2
@@ -41,11 +40,39 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}        
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
         
       - name: Run Tests
-        run: ./gradlew test
-        
+        run: ./gradlew clean build test
+
+      # 5. 테스트 결과 보고서 생성
+      - name: Generate Test Report
+        if: always() # 항상 실행되도록 설정 (성공 여부와 무관)
+        run: |
+          echo "Test completed!"
+          cat build/reports/tests/test/index.html || echo "No test report found."
+
+      # 6. 테스트 결과를 PR에 표시
+      - name: Annotate Test Results
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@v3 # PR에 결과 주석
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          header: Test Results
+          message: |
+            :x: Tests failed for this PR.
+            Check the build logs for more details.
+
+      - name: Post success comment
+        if: success()
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          header: Test Results
+          message: |
+            ✅ All tests passed for this PR!
 
 
   
