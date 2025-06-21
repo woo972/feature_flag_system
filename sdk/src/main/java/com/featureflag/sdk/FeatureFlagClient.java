@@ -3,6 +3,7 @@ package com.featureflag.sdk;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.featureflag.shared.config.JacksonConfig;
+import com.featureflag.shared.model.FeatureFlagStatus;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.featureflag.sdk.config.FeatureFlagClientConfig;
@@ -57,7 +58,7 @@ public class FeatureFlagClient implements AutoCloseable {
             flag = flagCache.getIfPresent(flagId);
         }
 
-        if (flag == null || flag.getStatus() == FeatureFlag.Status.OFF) {
+        if (flag == null || flag.getStatus() == FeatureFlagStatus.OFF) {
             return false;
         }
 
@@ -68,7 +69,7 @@ public class FeatureFlagClient implements AutoCloseable {
         return flag.getCriteria().entrySet().stream()
             .allMatch(entry -> {
                 String value = criteria.get(entry.getKey());
-                return value != null && entry.getValue().contains(value);
+                return value != null && entry.getValue().equals(value);
             });
     }
 

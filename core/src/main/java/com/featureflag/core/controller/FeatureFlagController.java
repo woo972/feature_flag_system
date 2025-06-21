@@ -1,19 +1,17 @@
 package com.featureflag.core.controller;
 
 import com.featureflag.core.service.FeatureFlagService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/feature-flags")
 public class FeatureFlagController {
     private final FeatureFlagService featureFlagService;
-
-    public FeatureFlagController(FeatureFlagService featureFlagService) {
-        this.featureFlagService = featureFlagService;
-    }
 
     @GetMapping("/evaluate/{flag-id}")
     public ResponseEntity<Boolean> evaluate(

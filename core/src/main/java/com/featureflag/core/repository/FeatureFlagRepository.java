@@ -1,6 +1,5 @@
 package com.featureflag.core.repository;
 
-import com.featureflag.shared.model.FeatureFlag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
