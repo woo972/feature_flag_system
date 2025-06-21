@@ -18,8 +18,8 @@ The MVP of the feature flag system will enable basic dynamic control over applic
 - Evaluate feature flag status based on simple criteria (e.g., user role, platform).
 
 #### Criteria Supported in MVP:
-- User roles: (e.g., non_member, member).
-- Platform: (e.g., IOS, ANDROID).
+- User roles: (e.g., non_member, member, super_admin).
+- Platform: (e.g., Mobile, Web).
 
 ### Feature Flag Dashboard
 
@@ -54,7 +54,7 @@ The MVP of the feature flag system will enable basic dynamic control over applic
   "status": "ON", // OFF
   "criteria": {
     "user_roles": ["member"],
-    "platforms": ["IOS"]
+    "platforms": ["WEB"]
   },
   "created_at": "2024-12-08T10:00:00Z"
 }
