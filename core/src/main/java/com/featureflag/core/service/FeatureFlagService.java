@@ -1,5 +1,6 @@
 package com.featureflag.core.service;
 
+import com.featureflag.core.repository.FeatureFlagEntity;
 import com.featureflag.core.repository.FeatureFlagRepository;
 import com.featureflag.shared.model.FeatureFlag;
 import org.springframework.cache.annotation.CacheEvict;
@@ -18,26 +19,15 @@ public class FeatureFlagService {
     }
 
     @Cacheable(value = "featureFlags", key = "#flagId")
-    public boolean evaluateFlag(Long flagId, Map<String, String> criteria) {
-        Optional<FeatureFlag> flag = repository.findById(flagId);
-        
-        if (flag.isEmpty() || flag.get().getStatus() == FeatureFlag.Status.OFF) {
-            return false;
-        }
-
-        return evaluateCriteria(flag.get(), criteria);
+    public boolean evaluate(Long flagId, Map<String, String> criteria) {
+        return repository.findById(flagId)
+                .map(FeatureFlagEntity::toDomainModel)
+                .map(flag -> flag.evaluate(criteria))
+                .orElse(false);
     }
 
     @CacheEvict(value = "featureFlags", allEntries = true)
     public void refreshCache() {
         // Cache is cleared via annotation
-    }
-
-    private boolean evaluateCriteria(FeatureFlag flag, Map<String, String> criteria) {
-        return flag.getCriteria().entrySet().stream()
-            .allMatch(entry -> {
-                String value = criteria.get(entry.getKey());
-                return value != null && entry.getValue().contains(value);
-            });
     }
 }

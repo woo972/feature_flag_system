@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface FeatureFlagRepository extends JpaRepository<FeatureFlag, Long> {
-    Optional<FeatureFlag> findById(Long id);
+public interface FeatureFlagRepository extends JpaRepository<FeatureFlagEntity, Long> {
+    Optional<FeatureFlagEntity> findById(Long id);
 }
