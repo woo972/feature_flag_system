@@ -4,13 +4,13 @@ import com.featureflag.shared.model.FeatureFlag;
 import com.featureflag.shared.model.FeatureFlagStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@Setter
 @Table(name = "feature_flags")
 public class FeatureFlagEntity {
     @Id
@@ -19,6 +19,9 @@ public class FeatureFlagEntity {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "description", nullable = true)
+    private String description;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -36,10 +39,15 @@ public class FeatureFlagEntity {
     @Column(name = "archved_at", nullable = true)
     private LocalDateTime archvedAt;
 
+    public FeatureFlagEntity() {
+        createdAt = LocalDateTime.now();
+    }
+
     public FeatureFlag toDomainModel() {
         FeatureFlag featureFlag = new FeatureFlag();
         featureFlag.setId(id);
         featureFlag.setName(name);
+        featureFlag.setDescription(description);
         featureFlag.setStatus(status);
         if(criteria != null) {
             featureFlag.setCriteria(criteria);

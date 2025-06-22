@@ -16,6 +16,14 @@ import java.util.Optional;
 public class FeatureFlagService {
     private final FeatureFlagRepository repository;
 
+    public void register(RegisterFeatureFlagRequest request) {
+        FeatureFlagEntity entity = new FeatureFlagEntity();
+        entity.setName(request.getName());
+        entity.setDescription(request.getDescription());
+        entity.setCriteria(request.getCriteria());
+        repository.save(entity);
+    }
+
     @Cacheable(value = "featureFlags", key = "#flagId")
     public boolean evaluate(Long flagId, Map<String, String> criteria) {
         return repository.findById(flagId)

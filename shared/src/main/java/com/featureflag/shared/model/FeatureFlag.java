@@ -14,6 +14,7 @@ import static java.util.Collections.emptyMap;
 public class FeatureFlag {
     private Long id;
     private String name;
+    private String description;
     private FeatureFlagStatus status = FeatureFlagStatus.OFF;
     private List<TargetingRule> rules = emptyList();
     private Map<String, Object> criteria = emptyMap();

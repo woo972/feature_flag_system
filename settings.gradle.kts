@@ -2,7 +2,7 @@ rootProject.name = "feature-flag-system"
 
 include(
     "core",
-    "dashboard",
+    "admin",
     "sdk",
     "shared"
 )

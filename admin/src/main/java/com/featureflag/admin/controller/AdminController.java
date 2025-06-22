@@ -1,19 +1,18 @@
-package com.featureflag.dashboard.controller;
+package com.featureflag.admin.controller;
 
 import com.featureflag.core.service.FeatureFlagService;
+import com.featureflag.core.service.RegisterFeatureFlagRequest;
 import com.featureflag.shared.model.FeatureFlag;
-import org.springframework.stereotype.Controller;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/dashboard")
-public class DashboardController {
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1/admin")
+public class AdminController {
     private final FeatureFlagService featureFlagService;
-
-    public DashboardController(FeatureFlagService featureFlagService) {
-        this.featureFlagService = featureFlagService;
-    }
 
     @GetMapping
     public String dashboard(Model model) {
@@ -21,10 +20,10 @@ public class DashboardController {
         return "dashboard";
     }
 
-    @PostMapping("/flags")
-    public String createFlag(@ModelAttribute FeatureFlag featureFlag) {
-        // Create new feature flag
-        return "redirect:/dashboard";
+    @PostMapping("/feature-flags")
+    public ResponseEntity<Void> register(@RequestBody RegisterFeatureFlagRequest request) {
+        featureFlagService.register(request);
+        return ResponseEntity.created(null).build();
     }
 
     @PutMapping("/flags/{id}")

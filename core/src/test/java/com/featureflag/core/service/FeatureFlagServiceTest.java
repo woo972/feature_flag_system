@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class FeatureFlagServiceTest {
 
@@ -23,6 +23,22 @@ class FeatureFlagServiceTest {
         sut = new FeatureFlagService(flagRepository);
     }
 
+    @DisplayName("invoke repository save method when register feature flag")
+    @Test
+    public void invokeRepositorySaveMethod() {
+        RegisterFeatureFlagRequest request = new RegisterFeatureFlagRequest(
+                "feature-1",
+                "desc",
+                new HashMap<>() {{
+                    put("key", "value");
+                }});
+
+        sut.register(request);
+
+        verify(flagRepository).save(any(FeatureFlagEntity.class));
+    }
+
+
     @DisplayName("returns true when flag is on and criteria matches")
     @Test
     public void returnsTrueWhenFlagIsOnAndCriteriaMatches() {
@@ -31,6 +47,7 @@ class FeatureFlagServiceTest {
         FeatureFlagEntity flag = new FeatureFlagEntity(
                 flagId,
                 "flag",
+                "description",
                 FeatureFlagStatus.ON,
                 null,
                 null,
@@ -60,6 +77,7 @@ class FeatureFlagServiceTest {
         FeatureFlagEntity flag = new FeatureFlagEntity(
                 flagId,
                 "flag",
+                "description",
                 FeatureFlagStatus.OFF,
                 null,
                 null,
