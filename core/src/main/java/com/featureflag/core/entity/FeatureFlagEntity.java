@@ -1,17 +1,21 @@
-package com.featureflag.core.repository;
+package com.featureflag.core.entity;
 
+import com.featureflag.core.repository.converter.MapToJsonConverter;
 import com.featureflag.shared.model.FeatureFlag;
 import com.featureflag.shared.model.FeatureFlagStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
 @AllArgsConstructor
+@Getter
 @Setter
 @Table(name = "feature_flags")
+@Entity
 public class FeatureFlagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +32,7 @@ public class FeatureFlagEntity {
     private FeatureFlagStatus status = FeatureFlagStatus.OFF;
 
     @Column(name = "criteria", nullable = true)
+    @Convert(converter = MapToJsonConverter.class)
     private Map<String, Object> criteria;
 
     @Column(name = "created_at", nullable = false)

@@ -5,19 +5,27 @@ import com.featureflag.core.service.RegisterFeatureFlagRequest;
 import com.featureflag.shared.model.FeatureFlag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
-@RestController
-@RequestMapping("/api/v1/admin")
+@Controller
+@RequestMapping("/admin")
 public class AdminController {
     private final FeatureFlagService featureFlagService;
 
-    @GetMapping
-    public String dashboard(Model model) {
-        // Add feature flags to the model
-        return "dashboard";
+    @GetMapping("/feature-flags")
+    public String list(Model model) {
+        model.addAttribute("featureFlags", featureFlagService.list());
+        return "/admin/feature-flags";
+    }
+
+    @GetMapping("/feature-flags/{id}")
+    public String get(@PathVariable(value = "id", required = true) Long id,
+                                    Model model) {
+        model.addAttribute("featureFlag", featureFlagService.get(id));
+        return "/admin/feature-flag-detail";
     }
 
     @PostMapping("/feature-flags")

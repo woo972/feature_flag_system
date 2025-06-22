@@ -1,0 +1,50 @@
+/* Custom styles to complement Tailwind CSS */
+.shadcn-btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background;
+}
+
+.shadcn-btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+}
+
+.shadcn-card {
+    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+}
+
+.shadcn-input {
+    @apply flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+/* Toast notification */
+.toast {
+    @apply fixed top-4 right-4 z-50 max-w-md bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 ease-in-out;
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-success {
+    @apply border-l-4 border-green-500;
+}
+
+.toast-error {
+    @apply border-l-4 border-red-500;
+}
+
+.toast-content {
+    @apply p-4;
+}
+
+/* Animation for table rows */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#flagsTableBody tr {
+    animation: fadeIn 0.3s ease-out forwards;
+}

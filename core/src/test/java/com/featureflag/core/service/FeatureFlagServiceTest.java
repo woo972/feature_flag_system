@@ -1,13 +1,15 @@
 package com.featureflag.core.service;
 
-import com.featureflag.core.repository.FeatureFlagEntity;
+import com.featureflag.core.entity.FeatureFlagEntity;
 import com.featureflag.core.repository.FeatureFlagRepository;
+import com.featureflag.shared.model.FeatureFlag;
 import com.featureflag.shared.model.FeatureFlagStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import static org.mockito.Mockito.*;
@@ -22,6 +24,65 @@ class FeatureFlagServiceTest {
         flagRepository = mock(FeatureFlagRepository.class);
         sut = new FeatureFlagService(flagRepository);
     }
+
+    @DisplayName("get all feature flags")
+    @Test
+    public void getAllFeatureFlags() {
+        FeatureFlagEntity entity = new FeatureFlagEntity(
+                1L,
+                "flag",
+                "description",
+                FeatureFlagStatus.ON,
+                null,
+                null,
+                null,
+                null
+        );
+        when(flagRepository.findAll()).thenReturn(List.of(entity));
+
+        List<FeatureFlag> result = sut.list();
+
+        FeatureFlag flag = result.getFirst();
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(entity.getId(), flag.getId());
+        Assertions.assertEquals(entity.getName(), flag.getName());
+        Assertions.assertEquals(entity.getDescription(), flag.getDescription());
+        Assertions.assertEquals(entity.getStatus(), flag.getStatus());
+        Assertions.assertEquals(entity.getCriteria(), flag.getCriteria());
+        Assertions.assertEquals(entity.getCreatedAt(), flag.getCreatedAt());
+        Assertions.assertEquals(entity.getUpdatedAt(), flag.getUpdatedAt());
+        Assertions.assertEquals(entity.getArchvedAt(), flag.getArchivedAt());
+    }
+
+    @DisplayName("get feature flag by id")
+    @Test
+    public void getFeatureFlagById() {
+        Long id = 1L;
+        FeatureFlagEntity entity = new FeatureFlagEntity(
+                id,
+                "flag",
+                "description",
+                FeatureFlagStatus.ON,
+                null,
+                null,
+                null,
+                null
+        );
+
+        when(flagRepository.findById(id)).thenReturn(Optional.of(entity));
+
+        FeatureFlag result = sut.get(id);
+
+        Assertions.assertEquals(entity.getId(), result.getId());
+        Assertions.assertEquals(entity.getName(), result.getName());
+        Assertions.assertEquals(entity.getDescription(), result.getDescription());
+        Assertions.assertEquals(entity.getStatus(), result.getStatus());
+        Assertions.assertEquals(entity.getCriteria(), result.getCriteria());
+        Assertions.assertEquals(entity.getCreatedAt(), result.getCreatedAt());
+        Assertions.assertEquals(entity.getUpdatedAt(), result.getUpdatedAt());
+        Assertions.assertEquals(entity.getArchvedAt(), result.getArchivedAt());
+    }
+
 
     @DisplayName("invoke repository save method when register feature flag")
     @Test
