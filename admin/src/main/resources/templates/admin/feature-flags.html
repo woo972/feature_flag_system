@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Feature Flag 상세 정보</title>
+  <title>Feature Flag 목록</title>
   <link rel="stylesheet" href="/css/styles.css">
   <style>
     body {
@@ -15,7 +15,7 @@
       padding: 20px;
     }
     .container {
-      max-width: 800px;
+      max-width: 1000px;
       margin: 0 auto;
       background-color: #fff;
       border-radius: 8px;
@@ -23,9 +23,6 @@
       padding: 20px;
     }
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       margin-bottom: 20px;
       border-bottom: 1px solid #eee;
       padding-bottom: 10px;
@@ -35,24 +32,27 @@
       font-size: 24px;
       color: #333;
     }
-    .back-link {
-      color: #0066cc;
-      text-decoration: none;
-    }
-    .back-link:hover {
-      text-decoration: underline;
-    }
-    .flag-header {
+    table {
+      width: 100%;
+      border-collapse: collapse;
       margin-bottom: 20px;
     }
-    .flag-name {
-      font-size: 20px;
-      font-weight: 600;
-      margin: 0 0 5px 0;
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
     }
-    .flag-description {
-      color: #666;
-      margin: 0;
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+    }
+    tr {
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    tr:hover {
+      background-color: #f8f9fa;
     }
     .status-badge {
       display: inline-block;
@@ -69,105 +69,110 @@
       background-color: #ffebee;
       color: #c62828;
     }
-    .info-section {
-      margin-bottom: 20px;
-    }
-    .info-section h2 {
-      font-size: 16px;
-      margin: 0 0 10px 0;
-      color: #555;
-    }
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-    .info-item {
-      border-bottom: 1px solid #eee;
-      padding-bottom: 8px;
+    .pagination {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
+      margin-top: 20px;
+      list-style-type: none;
+      padding: 0;
     }
-    .info-label {
-      color: #666;
+    .pagination li {
+      margin: 0 5px;
     }
-    .info-value {
-      font-weight: 500;
-    }
-    .code-block {
-      background-color: #f5f5f5;
+    .pagination a, .pagination span {
+      display: inline-block;
+      padding: 8px 12px;
+      text-decoration: none;
       border-radius: 4px;
-      padding: 10px;
-      overflow-x: auto;
+      color: #333;
+      background-color: #f8f9fa;
     }
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 14px;
+    .pagination .active a {
+      background-color: #0066cc;
+      color: white;
+    }
+    .pagination a:hover:not(.active) {
+      background-color: #ddd;
+    }
+    .empty-message {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-style: italic;
+    }
+    .detail-link {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .detail-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h1>Feature Flag 상세 정보</h1>
-    <a th:href="@{/api/v1/admin/feature-flags}" class="back-link">← 목록으로</a>
+    <h1>Feature Flag 목록</h1>
   </div>
 
-  <div class="flag-header">
-    <h2 class="flag-name" th:text="${featureFlag.name}">Feature Flag 이름</h2>
-    <p class="flag-description" th:text="${featureFlag.description}">Feature Flag 설명</p>
-    <div style="margin-top: 10px;">
-      <span th:if="${featureFlag.status.name() == 'ON'}" class="status-badge status-on">활성화</span>
-      <span th:if="${featureFlag.status.name() == 'OFF'}" class="status-badge status-off">비활성화</span>
-    </div>
+  <div th:if="${featureFlagPage.isEmpty()}" class="empty-message">
+    등록된 Feature Flag가 없습니다.
   </div>
 
-  <div class="info-section">
-    <h2>기본 정보</h2>
-    <div class="info-grid">
-      <div class="info-item">
-        <span class="info-label">ID</span>
-        <span class="info-value" th:text="${featureFlag.id}">1</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">생성일</span>
-        <span class="info-value" th:text="${#temporals.format(featureFlag.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">수정일</span>
-        <span class="info-value" th:text="${#temporals.format(featureFlag.updatedAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">아카이브 여부</span>
-        <span class="info-value" th:text="${featureFlag.archivedAt != null ? '아카이브됨' : '활성'}">활성</span>
-      </div>
-    </div>
-  </div>
+  <div th:if="${!featureFlagPage.isEmpty()}">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>NAME</th>
+          <th>DESCRIPTION</th>
+          <th>STATUS</th>
+          <th>CREATED</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr th:each="flag : ${featureFlagPage.content}"
+          th:onclick="'window.location.href=\'/admin/feature-flags/' + ${flag.id} + '\''"
+          style="cursor: pointer;">
+        <td th:text="${flag.id}">1</td>
+        <td th:text="${flag.name}">Feature Flag 이름</td>
+        <td th:text="${#strings.abbreviate(flag.description, 50)}">Feature Flag 설명...</td>
+        <td>
+          <span th:if="${flag.status.name() == 'ON'}" class="status-badge status-on">ON</span>
+          <span th:if="${flag.status.name() == 'OFF'}" class="status-badge status-off">OFF</span>
+        </td>
+        <td th:text="${#temporals.format(flag.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</td>
+      </tr>
+      </tbody>
+    </table>
 
-  <div class="info-section">
-    <h2>평가 기준</h2>
-    <div th:if="${featureFlag.criteria != null && !featureFlag.criteria.isEmpty()}" class="code-block">
-      <pre th:text="${#strings.replace(#strings.replace(#objects.nullSafe(featureFlag.criteria, {}), '{', '{\n  '), '}', '\n}')}"></pre>
-    </div>
-    <div th:if="${featureFlag.criteria == null || featureFlag.criteria.isEmpty()}" style="color: #666; font-style: italic;">
-      평가 기준이 설정되지 않았습니다.
-    </div>
-  </div>
+    <div th:if="${featureFlagPage.totalPages > 1}">
+      <ul class="pagination">
+        <li th:class="${currentPage == 0 ? 'disabled' : ''}">
+          <a th:if="${currentPage > 0}" th:href="@{'/admin/feature-flags?page=0&size=' + ${pageSize}}">처음</a>
+          <span th:unless="${currentPage > 0}">처음</span>
+        </li>
+        <li th:class="${currentPage == 0 ? 'disabled' : ''}">
+          <a th:if="${currentPage > 0}" th:href="@{'/admin/feature-flags?page=' + ${currentPage - 1} + '&size=' + ${pageSize}}">이전</a>
+          <span th:unless="${currentPage > 0}">이전</span>
+        </li>
 
-  <div class="info-section">
-    <h2>타겟팅 규칙</h2>
-    <div th:if="${featureFlag.rules != null && !featureFlag.rules.isEmpty()}">
-      <div th:each="rule : ${featureFlag.rules}" style="margin-bottom: 10px;">
-        <div class="code-block">
-          <div style="font-weight: 500; margin-bottom: 5px;" th:text="${rule.getClass().getSimpleName()}">RegionRule</div>
-          <div style="color: #555;" th:text="${rule}">규칙 상세 정보</div>
-        </div>
-      </div>
-    </div>
-    <div th:if="${featureFlag.rules == null || featureFlag.rules.isEmpty()}" style="color: #666; font-style: italic;">
-      타겟팅 규칙이 설정되지 않았습니다.
+        <li th:each="i: ${#numbers.sequence(0, featureFlagPage.totalPages - 1)}"
+            th:if="${i >= currentPage - 2 and i <= currentPage + 2}"
+            th:class="${currentPage == i ? 'active' : ''}">
+          <a th:href="@{'/admin/feature-flags?page=' + ${i} + '&size=' + ${pageSize}}"
+             th:text="${i + 1}">1</a>
+        </li>
+
+        <li th:class="${currentPage + 1 >= featureFlagPage.totalPages ? 'disabled' : ''}">
+          <a th:if="${currentPage + 1 < featureFlagPage.totalPages}" th:href="@{'/admin/feature-flags?page=' + ${currentPage + 1} + '&size=' + ${pageSize}}">다음</a>
+          <span th:unless="${currentPage + 1 < featureFlagPage.totalPages}">다음</span>
+        </li>
+        <li th:class="${currentPage + 1 >= featureFlagPage.totalPages ? 'disabled' : ''}">
+          <a th:if="${currentPage + 1 < featureFlagPage.totalPages}" th:href="@{'/admin/feature-flags?page=' + ${featureFlagPage.totalPages - 1} + '&size=' + ${pageSize}}">마지막</a>
+          <span th:unless="${currentPage + 1 < featureFlagPage.totalPages}">마지막</span>
+        </li>
+      </ul>
     </div>
   </div>
 </div>

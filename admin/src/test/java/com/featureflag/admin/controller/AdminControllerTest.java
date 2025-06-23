@@ -1,7 +1,7 @@
 package com.featureflag.admin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.featureflag.core.service.FeatureFlagService;
+import com.featureflag.admin.service.AdminFeatureFlagService;
 import com.featureflag.core.service.RegisterFeatureFlagRequest;
 import com.featureflag.shared.model.FeatureFlag;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AdminController.class)
 class AdminControllerTest {
     @MockBean
-    private FeatureFlagService featureFlagService;
+    private AdminFeatureFlagService adminFeatureFlagService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,7 +35,7 @@ class AdminControllerTest {
     @DisplayName("returns 201 if flag is registered")
     @Test
     public void returns201IfFlagIsRegistered() throws Exception {
-        doNothing().when(featureFlagService).register(any(RegisterFeatureFlagRequest.class));
+        doNothing().when(adminFeatureFlagService).register(any(RegisterFeatureFlagRequest.class));
 
         RegisterFeatureFlagRequest request = new RegisterFeatureFlagRequest(
                 "feature-1",
@@ -55,24 +56,29 @@ class AdminControllerTest {
         Long id = 1L;
         FeatureFlag featureFlag = new FeatureFlag();
         featureFlag.setId(id);
-        when(featureFlagService.get(id)).thenReturn(featureFlag);
+        when(adminFeatureFlagService.get(id)).thenReturn(featureFlag);
 
         mockMvc.perform(get("/api/v1/admin/feature-flags/"+id))
                 .andExpect(model().attribute("featureFlag", featureFlag))
                 .andExpect(view().name("/admin/feature-flag-detail"));
     }
 
-//    @DisplayName("returns feature-flag models")
-//    @Test
-//    public void returnsFeatureFlagModels() throws Exception {
-//        Long id = 1L;
-//        FeatureFlag featureFlag = new FeatureFlag();
-//        featureFlag.setId(id);
-//        List<FeatureFlag> list = List.of(featureFlag);
-//        when(featureFlagService.list()).thenReturn(list);
-//
-//        mockMvc.perform(get("/api/v1/admin/feature-flags"))
-//                .andExpect(model().attribute("featureFlags", list))
-//                .andExpect(view().name("/admin/feature-flags"));
-//    }
+    @DisplayName("returns feature-flags page model")
+    @Test
+    public void returnsFeatureFlagsPageModel() throws Exception {
+        Long id = 1L;
+        FeatureFlag featureFlag = new FeatureFlag();
+        featureFlag.setId(id);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
+        Page<FeatureFlag> page = new PageImpl<>(List.of(featureFlag));
+        when(adminFeatureFlagService.list(pageable)).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/admin/feature-flags/")
+                .param("page", "0")
+                .param("size", "10")
+                .param("sort", "id")
+                .param("direction", "desc"))
+                .andExpect(model().attribute("featureFlags", page))
+                .andExpect(view().name("/admin/feature-flags"));
+    }
 }

@@ -8,10 +8,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import static org.mockito.Mockito.*;
 
 class FeatureFlagServiceTest {
@@ -28,6 +31,8 @@ class FeatureFlagServiceTest {
     @DisplayName("get all feature flags")
     @Test
     public void getAllFeatureFlags() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
+
         FeatureFlagEntity entity = new FeatureFlagEntity(
                 1L,
                 "flag",
@@ -38,12 +43,13 @@ class FeatureFlagServiceTest {
                 null,
                 null
         );
-        when(flagRepository.findAll()).thenReturn(List.of(entity));
+        Page<FeatureFlagEntity> page = new PageImpl<>(List.of(entity));
+        when(flagRepository.findAll(pageable)).thenReturn(page);
 
-        List<FeatureFlag> result = sut.list();
+        Page<FeatureFlag> result = sut.list(pageable);
 
-        FeatureFlag flag = result.getFirst();
-        Assertions.assertEquals(1, result.size());
+        FeatureFlag flag = result.getContent().get(0);
+        Assertions.assertEquals(1, result.getContent().size());
         Assertions.assertEquals(entity.getId(), flag.getId());
         Assertions.assertEquals(entity.getName(), flag.getName());
         Assertions.assertEquals(entity.getDescription(), flag.getDescription());
@@ -52,6 +58,9 @@ class FeatureFlagServiceTest {
         Assertions.assertEquals(entity.getCreatedAt(), flag.getCreatedAt());
         Assertions.assertEquals(entity.getUpdatedAt(), flag.getUpdatedAt());
         Assertions.assertEquals(entity.getArchvedAt(), flag.getArchivedAt());
+        Assertions.assertEquals(0, result.getNumber());
+        Assertions.assertEquals(1, result.getTotalElements());
+        Assertions.assertEquals(1, result.getTotalPages());
     }
 
     @DisplayName("get feature flag by id")

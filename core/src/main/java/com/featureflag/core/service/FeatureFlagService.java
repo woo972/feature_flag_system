@@ -7,12 +7,11 @@ import com.featureflag.shared.model.FeatureFlag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -49,10 +48,8 @@ public class FeatureFlagService {
     }
 
     @Transactional(readOnly = true)
-    public List<FeatureFlag> list() {
-        return repository.findAll()
-                .stream()
-                .map(FeatureFlagEntity::toDomainModel)
-                .collect(Collectors.toList());
+    public Page<FeatureFlag> list(Pageable pageable) {
+        return repository.findAll(pageable)
+                .map(FeatureFlagEntity::toDomainModel);
     }
 }
