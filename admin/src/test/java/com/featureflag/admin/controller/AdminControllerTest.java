@@ -17,11 +17,13 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AdminController.class)
+@WebMvcTest(
+        controllers = AdminController.class
+)
 class AdminControllerTest {
     @MockBean
     private AdminFeatureFlagService adminFeatureFlagService;
@@ -44,7 +46,7 @@ class AdminControllerTest {
                     put("key", "value");
                 }});
 
-        mockMvc.perform(post("/api/v1/admin/feature-flags")
+        mockMvc.perform(post("/admin/feature-flags")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
@@ -58,7 +60,7 @@ class AdminControllerTest {
         featureFlag.setId(id);
         when(adminFeatureFlagService.get(id)).thenReturn(featureFlag);
 
-        mockMvc.perform(get("/api/v1/admin/feature-flags/"+id))
+        mockMvc.perform(get("/admin/feature-flags/" + id))
                 .andExpect(model().attribute("featureFlag", featureFlag))
                 .andExpect(view().name("/admin/feature-flag-detail"));
     }
@@ -73,12 +75,12 @@ class AdminControllerTest {
         Page<FeatureFlag> page = new PageImpl<>(List.of(featureFlag));
         when(adminFeatureFlagService.list(pageable)).thenReturn(page);
 
-        mockMvc.perform(get("/api/v1/admin/feature-flags/")
-                .param("page", "0")
-                .param("size", "10")
-                .param("sort", "id")
-                .param("direction", "desc"))
-                .andExpect(model().attribute("featureFlags", page))
+        mockMvc.perform(get("/admin/feature-flags")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "id")
+                        .param("direction", "desc"))
+                .andExpect(model().attribute("featureFlagPage", page))
                 .andExpect(view().name("/admin/feature-flags"));
     }
 }

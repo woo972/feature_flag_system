@@ -1,11 +1,9 @@
 package com.featureflag.admin.controller;
 
 import com.featureflag.admin.service.AdminFeatureFlagService;
-import com.featureflag.core.service.FeatureFlagService;
 import com.featureflag.core.service.RegisterFeatureFlagRequest;
 import com.featureflag.shared.model.FeatureFlag;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.SortDirection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
