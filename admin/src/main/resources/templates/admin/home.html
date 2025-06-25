@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>feature flag control plane</title>
+    <link rel="stylesheet" href="/css/admin.css"/>
+    <style>
+        .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar, .filter-bar {
+            margin-bottom: 1rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .table th {
+            background: #f4f4f4;
+        }
+
+        .register-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .register-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>feature flag control plane</h1>
+    <a th:href="@{/admin/register-feature-flag}">
+        <button class="register-btn">+ 등록</button>
+    </a>
+</div>
+
+<div class="search-bar">
+    <input type="text" placeholder="검색(준비중)" class="disabled" disabled/>
+    <select class="disabled" disabled>
+        <option>정렬(준비중)</option>
+    </select>
+    <select class="disabled" disabled>
+        <option>필터(준비중)</option>
+    </select>
+</div>
+
+<div th:replace="admin/feature-flags :: featureFlagList"></div>
+</body>
+</html>

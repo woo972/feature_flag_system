@@ -119,7 +119,7 @@
     등록된 Feature Flag가 없습니다.
   </div>
 
-  <div th:if="${!featureFlagPage.isEmpty()}">
+  <div th:if="${!featureFlagPage.isEmpty()}" th:fragment="featureFlagList">
     <table>
       <thead>
         <tr>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Feature Flag 등록</title>
+    <link rel="stylesheet" href="/css/admin.css"/>
+</head>
+<body>
+<h2>Feature Flag 등록</h2>
+<form th:action="@{/admin/feature-flags}" th:object="${registerFeatureFlagRequest}" method="post">
+    <div>
+        <label for="name">이름</label>
+        <input type="text" id="name" th:field="*{name}" required/>
+    </div>
+    <div>
+        <label for="description">설명</label>
+        <input type="text" id="description" th:field="*{description}"/>
+    </div>
+    <!-- 필요한 추가 필드가 있다면 여기에 -->
+    <button type="submit">등록</button>
+    <a th:href="@{/admin/home}">취소</a>
+</form>
+</body>
+</html>

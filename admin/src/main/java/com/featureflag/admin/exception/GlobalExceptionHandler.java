@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
         model.addAttribute("message", ex.getMessage());
         model.addAttribute("path", request.getRequestURI());
 
-        return "error/500";
+        return "error/error";
     }
 
 
