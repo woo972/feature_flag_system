@@ -14,16 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.HashMap;
 import java.util.List;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(
-        controllers = AdminController.class
-)
+@WebMvcTest(AdminController.class)
 class AdminControllerTest {
     @MockBean
     private AdminFeatureFlagService adminFeatureFlagService;
@@ -34,25 +31,49 @@ class AdminControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @DisplayName("returns 201 if flag is registered")
+    @DisplayName("returns home view")
     @Test
-    public void returns201IfFlagIsRegistered() throws Exception {
-        doNothing().when(adminFeatureFlagService).register(any(RegisterFeatureFlagRequest.class));
+    public void returnsHomeView() throws Exception {
+        Long id = 1L;
+        FeatureFlag featureFlag = new FeatureFlag();
+        featureFlag.setId(id);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
+        Page<FeatureFlag> page = new PageImpl<>(List.of(featureFlag));
+        when(adminFeatureFlagService.list(pageable)).thenReturn(page);
 
-        RegisterFeatureFlagRequest request = new RegisterFeatureFlagRequest(
-                "feature-1",
-                "desc",
-                new HashMap<>() {{
+        mockMvc.perform(get("/admin"))
+                .andExpect(model().attribute("featureFlagPage", page))
+                .andExpect(view().name("featureflags/dashboard"));
+    }
+
+    @DisplayName("returns register form view")
+    @Test
+    public void returnsRegisterView() throws Exception {
+        mockMvc.perform(get("/admin/feature-flags/new"))
+                .andExpect(view().name("featureflags/form"));
+    }
+
+    @DisplayName("create feature flags")
+    @Test
+    public void createFlag() throws Exception {
+        var request = RegisterFeatureFlagRequest.builder()
+                .name("feature-1")
+                .description("desc")
+                .criteria(new HashMap<>() {{
                     put("key", "value");
-                }});
+                }})
+                .build();
+
+        doNothing().when(adminFeatureFlagService).register(request);
 
         mockMvc.perform(post("/admin/feature-flags")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                        .andExpect(flash().attribute("Success", "Feature flag registered."))
+                        .andExpect(redirectedUrl("/admin"));
     }
 
-    @DisplayName("returns feature-flag model ")
+    @DisplayName("returns feature-flag model")
     @Test
     public void returnsFeatureFlagModel() throws Exception {
         Long id = 1L;
@@ -62,7 +83,7 @@ class AdminControllerTest {
 
         mockMvc.perform(get("/admin/feature-flags/" + id))
                 .andExpect(model().attribute("featureFlag", featureFlag))
-                .andExpect(view().name("/admin/feature-flag-detail"));
+                .andExpect(view().name("featureflags/detail"));
     }
 
     @DisplayName("returns feature-flags page model")
@@ -81,6 +102,6 @@ class AdminControllerTest {
                         .param("sort", "id")
                         .param("direction", "desc"))
                 .andExpect(model().attribute("featureFlagPage", page))
-                .andExpect(view().name("/admin/feature-flags"));
+                .andExpect(view().name("featureflags/list"));
     }
 }

@@ -8,10 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RequiredArgsConstructor
 @Controller
@@ -19,17 +19,27 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     private final AdminFeatureFlagService adminFeatureFlagService;
 
-    @GetMapping("/")
+    private static final String ADMIN_BASE_PATH = "featureflags";
+
+    @GetMapping
     public String homePage(Model model) {
         model.addAttribute("featureFlagPage",
                 adminFeatureFlagService.list(PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"))));
-        return "admin/home";
+        return ADMIN_BASE_PATH+"/dashboard";
     }
 
-    @GetMapping("/register-feature-flag")
+    @GetMapping("/feature-flags/new")
     public String registerPage(Model model) {
-        model.addAttribute("registerFeatureFlagRequest", new RegisterFeatureFlagRequest());
-        return "admin/register-feature-flag";
+        model.addAttribute("registerFeatureFlagRequest", RegisterFeatureFlagRequest.builder().build());
+        return ADMIN_BASE_PATH+"/form";
+    }
+
+    @PostMapping("/feature-flags")
+    public String register(@ModelAttribute("registerFeatureFlagRequest") RegisterFeatureFlagRequest request,
+                           RedirectAttributes redirectAttributes) {
+        adminFeatureFlagService.register(request);
+        redirectAttributes.addFlashAttribute("Success", "Feature flag registered.");
+        return  "redirect:/admin";
     }
 
     @GetMapping("/feature-flags")
@@ -46,21 +56,14 @@ public class AdminController {
         model.addAttribute("pageSize", size);
         model.addAttribute("sortField", sort);
         model.addAttribute("sortDirection", direction);
-        return "admin/feature-flags";
+        return ADMIN_BASE_PATH+"/list";
     }
 
     @GetMapping("/feature-flags/{id}")
     public String detailPage(@PathVariable(value = "id", required = true) Long id,
                       Model model) {
         model.addAttribute("featureFlag", adminFeatureFlagService.get(id));
-        return "admin/feature-flag-detail";
-    }
-
-    @PostMapping("/feature-flags")
-    public String register(@ModelAttribute("registerFeatureFlagRequest") RegisterFeatureFlagRequest request) {
-        System.out.println(request.getName());
-        adminFeatureFlagService.register(request);
-        return "redirect:/admin/";
+        return ADMIN_BASE_PATH+"/detail";
     }
 
     @PutMapping("/flags/{id}")

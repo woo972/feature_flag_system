@@ -1,14 +1,11 @@
 package com.featureflag.core.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.util.Map;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@Builder
 public class RegisterFeatureFlagRequest {
     private String name;
     private String description;
