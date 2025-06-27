@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-@Builder
 public class FeatureFlag {
     private Long id;
     private String name;
@@ -18,6 +17,18 @@ public class FeatureFlag {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime archivedAt;
+
+    @Builder
+    public FeatureFlag(Long id, String name, String description, FeatureFlagStatus status, List<TargetingRule> targetingRules, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime archivedAt) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.targetingRules = targetingRules;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.archivedAt = archivedAt;
+    }
 
     public boolean evaluate(Map<String, String> criteria) {
         if (status.equals(FeatureFlagStatus.OFF)) return false;

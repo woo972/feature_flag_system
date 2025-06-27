@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Getter
@@ -56,7 +57,12 @@ public class FeatureFlagEntity {
                 .name(name)
                 .description(description)
                 .status(status)
-                .targetingRules(targetingRules == null ? Collections.emptyList() : targetingRules.stream().map(TargetingRuleEntity::toDomainModel).toList())
+                .targetingRules(
+                        Optional.ofNullable(targetingRules)
+                                .map(rules -> rules.stream()
+                                        .map(TargetingRuleEntity::toDomainModel)
+                                        .toList())
+                                .orElse(null))
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .archivedAt(archivedAt)
