@@ -23,7 +23,6 @@ public class FeatureFlagService {
         FeatureFlagEntity entity = new FeatureFlagEntity();
         entity.setName(request.getName());
         entity.setDescription(request.getDescription());
-        entity.setCriteria(request.getCriteria());
         repository.save(entity);
     }
 

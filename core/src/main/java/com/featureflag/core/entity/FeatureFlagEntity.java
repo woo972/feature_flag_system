@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -31,9 +33,9 @@ public class FeatureFlagEntity {
     @Enumerated(EnumType.STRING)
     private FeatureFlagStatus status = FeatureFlagStatus.OFF;
 
-    @Column(name = "criteria", nullable = true)
-    @Convert(converter = MapToJsonConverter.class)
-    private Map<String, Object> criteria;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "feature_flag_id")
+    private List<TargetingRuleEntity> targetingRules;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -41,25 +43,23 @@ public class FeatureFlagEntity {
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
-    @Column(name = "archved_at", nullable = true)
-    private LocalDateTime archvedAt;
+    @Column(name = "archived_at", nullable = true)
+    private LocalDateTime archivedAt;
 
     public FeatureFlagEntity() {
         createdAt = LocalDateTime.now();
     }
 
     public FeatureFlag toDomainModel() {
-        FeatureFlag featureFlag = new FeatureFlag();
-        featureFlag.setId(id);
-        featureFlag.setName(name);
-        featureFlag.setDescription(description);
-        featureFlag.setStatus(status);
-        if(criteria != null) {
-            featureFlag.setCriteria(criteria);
-        }
-        featureFlag.setCreatedAt(createdAt);
-        featureFlag.setUpdatedAt(updatedAt);
-        featureFlag.setArchivedAt(archvedAt);
-        return featureFlag;
+        return FeatureFlag.builder()
+                .id(id)
+                .name(name)
+                .description(description)
+                .status(status)
+                .targetingRules(targetingRules == null ? Collections.emptyList() : targetingRules.stream().map(TargetingRuleEntity::toDomainModel).toList())
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .archivedAt(archivedAt)
+                .build();
     }
 }

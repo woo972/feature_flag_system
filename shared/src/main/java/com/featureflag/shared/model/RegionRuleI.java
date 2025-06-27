@@ -2,7 +2,7 @@ package com.featureflag.shared.model;
 
 import java.util.Map;
 
-public class RegionRule implements TargetingRule {
+public class RegionRuleI implements ITargetingRule {
     private String region;
 
     @Override
