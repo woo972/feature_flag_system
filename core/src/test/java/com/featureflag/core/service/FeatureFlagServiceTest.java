@@ -54,10 +54,10 @@ class FeatureFlagServiceTest {
         Assertions.assertEquals(entity.getName(), flag.getName());
         Assertions.assertEquals(entity.getDescription(), flag.getDescription());
         Assertions.assertEquals(entity.getStatus(), flag.getStatus());
-        Assertions.assertEquals(entity.getCriteria(), flag.getCriteria());
+        Assertions.assertEquals(entity.getTargetingRules(), flag.getTargetingRules());
         Assertions.assertEquals(entity.getCreatedAt(), flag.getCreatedAt());
         Assertions.assertEquals(entity.getUpdatedAt(), flag.getUpdatedAt());
-        Assertions.assertEquals(entity.getArchvedAt(), flag.getArchivedAt());
+        Assertions.assertEquals(entity.getArchivedAt(), flag.getArchivedAt());
         Assertions.assertEquals(0, result.getNumber());
         Assertions.assertEquals(1, result.getTotalElements());
         Assertions.assertEquals(1, result.getTotalPages());
@@ -86,10 +86,10 @@ class FeatureFlagServiceTest {
         Assertions.assertEquals(entity.getName(), result.getName());
         Assertions.assertEquals(entity.getDescription(), result.getDescription());
         Assertions.assertEquals(entity.getStatus(), result.getStatus());
-        Assertions.assertEquals(entity.getCriteria(), result.getCriteria());
+        Assertions.assertEquals(entity.getTargetingRules(), result.getTargetingRules());
         Assertions.assertEquals(entity.getCreatedAt(), result.getCreatedAt());
         Assertions.assertEquals(entity.getUpdatedAt(), result.getUpdatedAt());
-        Assertions.assertEquals(entity.getArchvedAt(), result.getArchivedAt());
+        Assertions.assertEquals(entity.getArchivedAt(), result.getArchivedAt());
     }
 
 
