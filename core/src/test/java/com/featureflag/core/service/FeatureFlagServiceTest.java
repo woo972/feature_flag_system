@@ -9,8 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.*;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,12 +94,11 @@ class FeatureFlagServiceTest {
     @DisplayName("invoke repository save method when register feature flag")
     @Test
     public void invokeRepositorySaveMethod() {
-        RegisterFeatureFlagRequest request = new RegisterFeatureFlagRequest(
-                "feature-1",
-                "desc",
-                new HashMap<>() {{
-                    put("key", "value");
-                }});
+        RegisterFeatureFlagRequest request = RegisterFeatureFlagRequest.builder()
+                .name("feature-1")
+                .description("desc")
+                .targetingRules(List.of())
+                .build();
 
         sut.register(request);
 

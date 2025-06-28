@@ -1,13 +1,15 @@
 package com.featureflag.shared.model;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.List;
 import java.util.Map;
 
 @Getter
+@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TargetingRule {
     private Long id;
     private String name;

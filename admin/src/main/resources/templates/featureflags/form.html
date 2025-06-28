@@ -3,6 +3,16 @@
 <head>
     <title>Feature Flag 등록</title>
     <link rel="stylesheet" href="/css/admin.css"/>
+    <style>
+        .rule-container { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        .rule-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .remove-rule { background-color: #f44336; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+        .add-rule { margin-bottom: 15px; background-color: #4CAF50; color: white; border: none; padding: 8px 12px; cursor: pointer; }
+        .rule-values { margin-top: 10px; }
+        .rule-value { display: flex; margin-bottom: 5px; }
+        .rule-value input { flex-grow: 1; margin-right: 5px; }
+        .remove-value { background-color: #ff9800; color: white; border: none; padding: 5px; cursor: pointer; }
+    </style>
 </head>
 <body>
 <h2>Feature Flag 등록</h2>
@@ -15,9 +25,123 @@
         <label for="description">설명</label>
         <input type="text" id="description" th:field="*{description}"/>
     </div>
+
+    <h2>타겟팅 규칙</h2>
+    <div id="rules-container">
+        <!-- 여기에 규칙이 동적으로 추가됩니다 -->
+    </div>
+    <button type="button" class="add-rule" onclick="addRule()">+ 규칙 추가</button>
+
     <!-- 필요한 추가 필드가 있다면 여기에 -->
     <button type="submit">등록</button>
     <a th:href="@{/admin}">홈으로 이동</a>
 </form>
+<script>
+    let ruleCount = 0;
+
+    function addRule() {
+        const container = document.getElementById('rules-container');
+        const ruleId = ruleCount++;
+
+        const ruleDiv = document.createElement('div');
+        ruleDiv.className = 'rule-container';
+        ruleDiv.id = `rule-${ruleId}`;
+
+        ruleDiv.innerHTML = `
+            <div class="rule-header">
+                <h3>규칙 #${ruleId + 1}</h3>
+                <button type="button" class="remove-rule" onclick="removeRule(${ruleId})">삭제</button>
+            </div>
+            <div class="form-group">
+                <label for="rules[${ruleId}].name">속성 이름</label>
+                <input type="text" id="rules[${ruleId}].name" name="targetingRules[${ruleId}].name" required/>
+            </div>
+            <div class="form-group">
+                <label for="rules[${ruleId}].operator">연산자</label>
+                <select id="rules[${ruleId}].operator" name="targetingRules[${ruleId}].operator" required>
+                    <option value="IN">포함(IN)</option>
+                    <option value="NOT_IN">미포함(NOT_IN)</option>
+                    <option value="EQUAL">일치(EQUAL)</option>
+                    <option value="NOT_EQUAL">불일치(NOT_EQUAL)</option>
+                    <option value="GREATER_THAN">초과(GREATER_THAN)</option>
+                    <option value="LESS_THAN">미만(LESS_THAN)</option>
+                    <option value="GREATER_THAN_EQUAL">이상(GREATER_THAN_EQUAL)</option>
+                    <option value="LESS_THAN_EQUAL">이하(LESS_THAN_EQUAL)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>값</label>
+                <div id="values-container-${ruleId}" class="rule-values">
+                    <div class="rule-value">
+                        <input type="text" name="targetingRules[${ruleId}].values[0]" required/>
+                    </div>
+                </div>
+                <button type="button" onclick="addValue(${ruleId})">+ 값 추가</button>
+            </div>
+        `;
+
+    }
+
+    function removeRule(ruleId) {
+        const ruleDiv = document.getElementById(`rule-${ruleId}`);
+        ruleDiv.remove();
+
+        // 규칙 번호 재정렬
+        updateRuleIndexes();
+    }
+
+    function addValue(ruleId) {
+        const valuesContainer = document.getElementById(`values-container-${ruleId}`);
+        const valueCount = valuesContainer.children.length;
+
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'rule-value';
+        valueDiv.innerHTML = `
+            <input type="text" name="targetingRules[${ruleId}].values[${valueCount}]" required/>
+            <button type="button" class="remove-value" onclick="this.parentElement.remove()">삭제</button>
+        `;
+
+        valuesContainer.appendChild(valueDiv);
+    }
+
+    function updateRuleIndexes() {
+        const containers = document.querySelectorAll('.rule-container');
+        containers.forEach((container, index) => {
+            // 헤더 업데이트
+            container.querySelector('h3').textContent = `규칙 #${index + 1}`;
+
+            // 입력 필드 이름 업데이트
+            const nameInput = container.querySelector('[id^="rules["]');
+            const operatorSelect = container.querySelector('select');
+            const valueInputs = container.querySelectorAll('.rule-value input');
+
+            nameInput.name = `targetingRules[${index}].name`;
+            nameInput.id = `rules[${index}].name`;
+
+            operatorSelect.name = `targetingRules[${index}].operator`;
+            operatorSelect.id = `rules[${index}].operator`;
+
+            valueInputs.forEach((input, valueIndex) => {
+                input.name = `targetingRules[${index}].values[${valueIndex}]`;
+            });
+
+            // 값 컨테이너 ID 업데이트
+            const valuesContainer = container.querySelector('[id^="values-container-"]');
+            valuesContainer.id = `values-container-${index}`;
+
+            // 버튼 onclick 업데이트
+            container.querySelector('.remove-rule').setAttribute('onclick', `removeRule(${index})`);
+            container.querySelector('button[onclick^="addValue"]').setAttribute('onclick', `addValue(${index})`);
+
+            // 컨테이너 ID 업데이트
+            container.id = `rule-${index}`;
+        });
+    }
+
+    // 페이지 로드 시 기본 규칙 하나 추가
+    document.addEventListener('DOMContentLoaded', function() {
+        addRule();
+    });
+</script>
 </body>
 </html>
