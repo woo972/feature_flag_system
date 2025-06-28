@@ -59,9 +59,7 @@ class AdminControllerTest {
         var request = RegisterFeatureFlagRequest.builder()
                 .name("feature-1")
                 .description("desc")
-                .criteria(new HashMap<>() {{
-                    put("key", "value");
-                }})
+                .targetingRules(List.of())
                 .build();
 
         doNothing().when(adminFeatureFlagService).register(request);
