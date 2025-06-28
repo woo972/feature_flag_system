@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.featureflag.admin.service.AdminFeatureFlagService;
 import com.featureflag.core.service.RegisterFeatureFlagRequest;
 import com.featureflag.shared.model.FeatureFlag;
+import com.featureflag.shared.model.FeatureFlagStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import static org.mockito.Mockito.doNothing;
@@ -34,9 +36,7 @@ class AdminControllerTest {
     @DisplayName("returns home view")
     @Test
     public void returnsHomeView() throws Exception {
-        Long id = 1L;
-        FeatureFlag featureFlag = new FeatureFlag();
-        featureFlag.setId(id);
+        var featureFlag = createFeatureFlag();
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
         Page<FeatureFlag> page = new PageImpl<>(List.of(featureFlag));
         when(adminFeatureFlagService.list(pageable)).thenReturn(page);
@@ -77,8 +77,7 @@ class AdminControllerTest {
     @Test
     public void returnsFeatureFlagModel() throws Exception {
         Long id = 1L;
-        FeatureFlag featureFlag = new FeatureFlag();
-        featureFlag.setId(id);
+        var featureFlag = createFeatureFlag();
         when(adminFeatureFlagService.get(id)).thenReturn(featureFlag);
 
         mockMvc.perform(get("/admin/feature-flags/" + id))
@@ -89,9 +88,8 @@ class AdminControllerTest {
     @DisplayName("returns feature-flags page model")
     @Test
     public void returnsFeatureFlagsPageModel() throws Exception {
-        Long id = 1L;
-        FeatureFlag featureFlag = new FeatureFlag();
-        featureFlag.setId(id);
+        var featureFlag = createFeatureFlag();
+
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
         Page<FeatureFlag> page = new PageImpl<>(List.of(featureFlag));
         when(adminFeatureFlagService.list(pageable)).thenReturn(page);
@@ -103,5 +101,16 @@ class AdminControllerTest {
                         .param("direction", "desc"))
                 .andExpect(model().attribute("featureFlagPage", page))
                 .andExpect(view().name("featureflags/list"));
+    }
+
+    private FeatureFlag createFeatureFlag(){
+        return FeatureFlag
+                .builder()
+                .id(1L)
+                .name("feature-1")
+                .description("desc")
+                .status(FeatureFlagStatus.ON)
+                .createdAt(LocalDateTime.MAX)
+                .build();
     }
 }

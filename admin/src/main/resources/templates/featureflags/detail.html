@@ -147,18 +147,8 @@
   </div>
 
   <div class="info-section">
-    <h2>평가 기준</h2>
-    <div th:if="${featureFlag.criteria != null && !featureFlag.criteria.isEmpty()}" class="code-block">
-      <pre th:text="${#strings.replace(#strings.replace(#objects.nullSafe(featureFlag.criteria, {}), '{', '{\n  '), '}', '\n}')}"></pre>
-    </div>
-    <div th:if="${featureFlag.criteria == null || featureFlag.criteria.isEmpty()}" style="color: #666; font-style: italic;">
-      평가 기준이 설정되지 않았습니다.
-    </div>
-  </div>
-
-  <div class="info-section">
     <h2>타겟팅 규칙</h2>
-    <div th:if="${featureFlag.rules != null && !featureFlag.rules.isEmpty()}">
+    <div th:if="${featureFlag.targetingRules != null && !featureFlag.targetingRules.isEmpty()}">
       <div th:each="rule : ${featureFlag.rules}" style="margin-bottom: 10px;">
         <div class="code-block">
           <div style="font-weight: 500; margin-bottom: 5px;" th:text="${rule.getClass().getSimpleName()}">RegionRule</div>
@@ -166,7 +156,7 @@
         </div>
       </div>
     </div>
-    <div th:if="${featureFlag.rules == null || featureFlag.rules.isEmpty()}" style="color: #666; font-style: italic;">
+    <div th:if="${featureFlag.targetingRules == null || featureFlag.targetingRules.isEmpty()}" style="color: #666; font-style: italic;">
       타겟팅 규칙이 설정되지 않았습니다.
     </div>
   </div>

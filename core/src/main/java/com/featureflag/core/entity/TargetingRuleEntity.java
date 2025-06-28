@@ -31,14 +31,14 @@ public class TargetingRuleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="feature_flag_id", nullable = false)
+    @Column(name = "feature_flag_id", nullable = false)
     private Long featureFlagId;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private String operator;
-    @Column(nullable = false)
+    private RuleOperator operator;
+    @Column(name = "rule_value", nullable = false)
     private String value;
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -49,7 +49,7 @@ public class TargetingRuleEntity {
         return TargetingRule.builder()
                 .id(id)
                 .name(name)
-                .operator(RuleOperator.valueOf(operator))
+                .operator(operator)
                 .values(List.of(value))
                 .build();
     }
