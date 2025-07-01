@@ -1,15 +1,19 @@
 package com.featureflag.sdk;
 
-import com.featureflag.shared.model.FeatureFlag;
 import lombok.extern.slf4j.Slf4j;
-import java.util.List;
+
+import java.util.Map;
 
 @Slf4j
 public class FeatureFlagClient {
 
-    private FeatureFlagClientService featureFlagClientService = new FeatureFlagClientService();
+    private final FeatureFlagClientService featureFlagClientService = new FeatureFlagClientService();
 
-    public List<FeatureFlag> getFeatureFlags() {
-        return featureFlagClientService.getFeatureFlags();
+    public void initialize() {
+        featureFlagClientService.initialize();
+    }
+
+    public boolean evaluate(String featureFlagName, Map<String, String> criteria) {
+        return featureFlagClientService.evaluate(featureFlagName, criteria);
     }
 }
