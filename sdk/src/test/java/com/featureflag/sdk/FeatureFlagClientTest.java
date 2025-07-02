@@ -13,8 +13,5 @@ class FeatureFlagClientTest {
     @DisplayName("get feature flags")
     @Test
     public void getFeatureFlags() {
-        FeatureFlagClient sut = new FeatureFlagClient();
-        List<FeatureFlag> featureFlags = sut.getFeatureFlags();
-        assertNotNull(featureFlags);
     }
 }

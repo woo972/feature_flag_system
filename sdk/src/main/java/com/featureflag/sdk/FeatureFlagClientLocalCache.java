@@ -10,12 +10,16 @@ import java.util.Optional;
 @Slf4j
 public class FeatureFlagClientLocalCache {
 
-    private final FeatureFlagClientService featureFlagClientService = new FeatureFlagClientService();
+    private boolean initialized = false;
 
     private static final Cache<String, FeatureFlag> LOCAL_CACHE = Caffeine.newBuilder()
             .maximumSize(1000)
             .recordStats()
             .build();
+
+    public boolean isInitialized() {
+        return initialized;
+    }
 
     /**
      * 모든 캐시 데이터를 무효화합니다.
@@ -35,6 +39,8 @@ public class FeatureFlagClientLocalCache {
         featureFlags.forEach(featureFlag -> {
             LOCAL_CACHE.put(featureFlag.getName(), featureFlag);
         });
+
+        this.initialized = true;
     }
 
     public Optional<FeatureFlag> get(String key) {
