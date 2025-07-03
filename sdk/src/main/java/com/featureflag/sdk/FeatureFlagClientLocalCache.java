@@ -26,6 +26,7 @@ public class FeatureFlagClientLocalCache {
      */
     public void invalidate() {
         LOCAL_CACHE.invalidateAll();
+        initialized = false;
     }
 
     /**
