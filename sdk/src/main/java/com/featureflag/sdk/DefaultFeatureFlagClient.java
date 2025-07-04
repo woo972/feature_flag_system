@@ -36,9 +36,4 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
                         }
                 );
     }
-
-    @Override
-    public boolean evaluateAsync(String featureFlagName, Map<String, String> criteria) {
-        throw new UnsupportedOperationException();
-    }
 }
