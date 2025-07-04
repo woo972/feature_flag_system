@@ -2,12 +2,13 @@ package com.featureflag.shared.model;
 
 import lombok.Builder;
 import lombok.Getter;
-
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Getter
+@NoArgsConstructor
 public class FeatureFlag {
     private Long id;
     private String name;
@@ -18,7 +19,7 @@ public class FeatureFlag {
     private LocalDateTime updatedAt;
     private LocalDateTime archivedAt;
 
-    @Builder
+    @Builder()
     public FeatureFlag(Long id, String name, String description, FeatureFlagStatus status, List<TargetingRule> targetingRules, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime archivedAt) {
         this.id = id;
         this.name = name;

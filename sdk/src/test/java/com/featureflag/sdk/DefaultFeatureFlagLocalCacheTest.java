@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
-class FeatureFlagClientLocalCacheTest {
+class DefaultFeatureFlagLocalCacheTest {
 
-    private FeatureFlagClientLocalCache sut;
+    private DefaultFeatureFlagLocalCache sut;
 
     @BeforeEach
     void setUp() {
-        sut = new FeatureFlagClientLocalCache();
+        sut = new DefaultFeatureFlagLocalCache();
         sut.invalidate();
     }
 

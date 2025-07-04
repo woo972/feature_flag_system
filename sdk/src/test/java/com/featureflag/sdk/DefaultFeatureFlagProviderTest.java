@@ -15,38 +15,20 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-class FeatureFlagClientServiceTest {
+class DefaultFeatureFlagProviderTest {
 
-    FeatureFlagClientService sut;
+    DefaultFeatureFlagProvider sut;
 
     FeatureFlagCoreHttpClient featureFlagCoreHttpClient = Mockito.mock(FeatureFlagCoreHttpClient.class);
     HttpClient httpClient = Mockito.mock(HttpClient.class);
     HttpResponse httpResponse = Mockito.mock(HttpResponse.class);
-    FeatureFlagClientLocalCache cache = Mockito.mock(FeatureFlagClientLocalCache.class);
 
     @BeforeEach
     void setUp() {
-        sut = new FeatureFlagClientService(featureFlagCoreHttpClient, cache);
+        sut = new DefaultFeatureFlagProvider(featureFlagCoreHttpClient);
     }
 
-    @DisplayName("refresh cache when invoke initialize method")
-    @Test
-    void initialize() throws IOException, InterruptedException {
-        when(featureFlagCoreHttpClient.get()).thenReturn(httpClient);
-        when(httpClient.send(FeatureFlagCoreHttpClient.GET_FEATURE_FLAGS, HttpResponse.BodyHandlers.ofString()))
-                .thenReturn(httpResponse);
-        sut.initialize();
-        Mockito.verify(cache).invalidate();
-        Mockito.verify(cache).load(Mockito.anyList());
-    }
-
-    @DisplayName("returns false when cache miss and cache is not initialized")
-    @Test
-    public void returnsTrueIfCacheIsNotInitialized() {
-        assertFalse(sut.evaluate("test-flag", null));
-    }
-
-    @DisplayName("returns false when cache miss and cache is initialized")
+    @DisplayName("returns feature flags when fetchAll is called")
     @Test
     public void returnsTrueIfCacheIsInitialized() throws IOException, InterruptedException {
         when(featureFlagCoreHttpClient.get()).thenReturn(httpClient);
@@ -58,7 +40,8 @@ class FeatureFlagClientServiceTest {
                         .writeValueAsString(List.of(FeatureFlag.builder()
                                 .name("dummy-flag-A")
                                 .build())));
-        sut.initialize();
-        assertFalse(sut.evaluate("dummy-flag-B", null));
+        var resutl = sut.fetchAll();
+        assertEquals(1, resutl.size());
+        assertEquals("dummy-flag-A", resutl.get(0).getName());
     }
 }
