@@ -3,7 +3,9 @@ package com.featureflag.core.service;
 import com.featureflag.core.entity.FeatureFlagEntity;
 import com.featureflag.core.repository.FeatureFlagRepository;
 import com.featureflag.shared.exception.FeatureFlagNotFoundException;
+import com.featureflag.shared.exception.FeatureFlagNotUpdatedException;
 import com.featureflag.shared.model.FeatureFlag;
+import com.featureflag.shared.model.FeatureFlagStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -11,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -50,5 +54,31 @@ public class FeatureFlagService {
     public Page<FeatureFlag> list(Pageable pageable) {
         return repository.findAll(pageable)
                 .map(FeatureFlagEntity::toDomainModel);
+    }
+
+    @Transactional
+    public FeatureFlag update(Long id, UpdateFeatureFlagRequest request) {
+        boolean stateChanged = false;
+        FeatureFlagEntity entity = repository.findById(id)
+                .orElseThrow(() -> new FeatureFlagNotFoundException(id));
+
+        FeatureFlagStatus toBeStatus = request.isOn() ? FeatureFlagStatus.ON : FeatureFlagStatus.OFF;
+        if (toBeStatus != entity.getStatus()) {
+            entity.setStatus(toBeStatus);
+            stateChanged = true;
+        }
+
+        LocalDateTime archivedAt = request.isArchive() ? LocalDateTime.now() : null;
+        if ((entity.getArchivedAt() == null && archivedAt != null)
+                || (entity.getArchivedAt() != null && archivedAt == null)) {
+            entity.setArchivedAt(archivedAt);
+            stateChanged = true;
+        }
+
+        if (stateChanged) {
+            return entity.toDomainModel();
+        }
+
+        throw new FeatureFlagNotUpdatedException(id);
     }
 }

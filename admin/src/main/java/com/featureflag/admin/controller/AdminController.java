@@ -2,6 +2,7 @@ package com.featureflag.admin.controller;
 
 import com.featureflag.admin.service.AdminFeatureFlagService;
 import com.featureflag.core.service.RegisterFeatureFlagRequest;
+import com.featureflag.core.service.UpdateFeatureFlagRequest;
 import com.featureflag.shared.model.FeatureFlag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,10 +67,12 @@ public class AdminController {
         return ADMIN_BASE_PATH+"/detail";
     }
 
-    @PutMapping("/flags/{id}")
-    public String updateFlag(@PathVariable String id, @ModelAttribute FeatureFlag featureFlag) {
-        // Update existing feature flag
-        return "redirect:/dashboard";
+    @PutMapping("/feature-flags/{id}")
+    public String updateFlag(@PathVariable(value = "id", required = true) Long id,
+                             @ModelAttribute("updateFeatureFlagRequest") UpdateFeatureFlagRequest request,
+                             Model model) {
+        model.addAttribute("featureFlag", adminFeatureFlagService.update(id, request));
+        return "redirect:/feature-flags/" + id;
     }
 
     @DeleteMapping("/flags/{id}")
