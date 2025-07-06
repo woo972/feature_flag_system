@@ -14,12 +14,10 @@ import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AdminController.class)
@@ -33,7 +31,7 @@ class AdminControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @DisplayName("returns home view")
+    @DisplayName("returns home page")
     @Test
     public void returnsHomeView() throws Exception {
         var featureFlag = createFeatureFlag();
@@ -46,7 +44,7 @@ class AdminControllerTest {
                 .andExpect(view().name("featureflags/dashboard"));
     }
 
-    @DisplayName("returns register form view")
+    @DisplayName("returns register page")
     @Test
     public void returnsRegisterView() throws Exception {
         mockMvc.perform(get("/admin/feature-flags/new"))
@@ -71,7 +69,7 @@ class AdminControllerTest {
                         .andExpect(redirectedUrl("/admin"));
     }
 
-    @DisplayName("returns feature-flag model")
+    @DisplayName("returns feature-flag-detail page & model")
     @Test
     public void returnsFeatureFlagModel() throws Exception {
         Long id = 1L;
@@ -83,7 +81,7 @@ class AdminControllerTest {
                 .andExpect(view().name("featureflags/detail"));
     }
 
-    @DisplayName("returns feature-flags page model")
+    @DisplayName("returns feature-flags page & model")
     @Test
     public void returnsFeatureFlagsPageModel() throws Exception {
         var featureFlag = createFeatureFlag();
@@ -101,6 +99,39 @@ class AdminControllerTest {
                 .andExpect(view().name("featureflags/list"));
     }
 
+    @DisplayName("returns feature-flag-detail page & model with on")
+    @Test
+    public void returnsFeatureFlagModelWithOn() throws Exception {
+        Long id = 1L;
+        var featureFlag = createFeatureFlag();
+        when(adminFeatureFlagService.on(id)).thenReturn(featureFlag);
+
+        mockMvc.perform(put("/admin/feature-flags/" + id + "/on"))
+                .andExpect(redirectedUrl("/admin/feature-flags/"+id));
+    }
+
+    @DisplayName("returns feature-flag-detail page & model with off")
+    @Test
+    public void returnsFeatureFlagModelWithOff() throws Exception {
+        Long id = 1L;
+        var featureFlag = createOffFeatureFlag();
+        when(adminFeatureFlagService.off(id)).thenReturn(featureFlag);
+
+        mockMvc.perform(put("/admin/feature-flags/" + id + "/off"))
+                .andExpect(redirectedUrl("/admin/feature-flags/"+id));
+    }
+
+    @DisplayName("returns feature-flag-detail page & model with archived")
+    @Test
+    public void returnsFeatureFlagModelWithArchived() throws Exception {
+        Long id = 1L;
+        var featureFlag = createFeatureFlag();
+        when(adminFeatureFlagService.archive(id)).thenReturn(featureFlag);
+
+        mockMvc.perform(put("/admin/feature-flags/" + id + "/archive"))
+                .andExpect(redirectedUrl("/admin/feature-flags/"+id));
+    }
+
     private FeatureFlag createFeatureFlag(){
         return FeatureFlag
                 .builder()
@@ -109,6 +140,29 @@ class AdminControllerTest {
                 .description("desc")
                 .status(FeatureFlagStatus.ON)
                 .createdAt(LocalDateTime.MAX)
+                .build();
+    }
+
+    private FeatureFlag createOffFeatureFlag(){
+        return FeatureFlag
+                .builder()
+                .id(1L)
+                .name("feature-1")
+                .description("desc")
+                .status(FeatureFlagStatus.OFF)
+                .createdAt(LocalDateTime.MAX)
+                .build();
+    }
+
+    private FeatureFlag createArchivedFeatureFlag(){
+        return FeatureFlag
+                .builder()
+                .id(1L)
+                .name("feature-1")
+                .description("desc")
+                .status(FeatureFlagStatus.OFF)
+                .createdAt(LocalDateTime.MAX)
+                .archivedAt(LocalDateTime.MAX)
                 .build();
     }
 }

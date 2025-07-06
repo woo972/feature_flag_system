@@ -1,6 +1,7 @@
 package com.featureflag.core.service;
 
 import com.featureflag.core.entity.FeatureFlagEntity;
+import com.featureflag.core.event.FeatureFlagUpdatedEvent;
 import com.featureflag.core.repository.FeatureFlagRepository;
 import com.featureflag.shared.exception.FeatureFlagNotFoundException;
 import com.featureflag.shared.exception.FeatureFlagNotUpdatedException;
@@ -9,11 +10,11 @@ import com.featureflag.shared.model.FeatureFlagStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import java.util.Map;
 @Service
 public class FeatureFlagService {
     private final FeatureFlagRepository repository;
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     public void register(RegisterFeatureFlagRequest request) {
@@ -57,28 +59,47 @@ public class FeatureFlagService {
     }
 
     @Transactional
-    public FeatureFlag update(Long id, UpdateFeatureFlagRequest request) {
-        boolean stateChanged = false;
+    public FeatureFlag on(Long id) {
         FeatureFlagEntity entity = repository.findById(id)
                 .orElseThrow(() -> new FeatureFlagNotFoundException(id));
 
-        FeatureFlagStatus toBeStatus = request.isOn() ? FeatureFlagStatus.ON : FeatureFlagStatus.OFF;
-        if (toBeStatus != entity.getStatus()) {
-            entity.setStatus(toBeStatus);
-            stateChanged = true;
+        if (FeatureFlagStatus.ON.equals(entity.getStatus())) {
+            throw new FeatureFlagNotUpdatedException(id);
         }
 
-        LocalDateTime archivedAt = request.isArchive() ? LocalDateTime.now() : null;
-        if ((entity.getArchivedAt() == null && archivedAt != null)
-                || (entity.getArchivedAt() != null && archivedAt == null)) {
-            entity.setArchivedAt(archivedAt);
-            stateChanged = true;
+        entity.setStatus(FeatureFlagStatus.ON);
+        var featureFlag = entity.toDomainModel();
+        publisher.publishEvent(new FeatureFlagUpdatedEvent(featureFlag));
+        return featureFlag;
+    }
+
+    @Transactional
+    public FeatureFlag off(Long id) {
+        FeatureFlagEntity entity = repository.findById(id)
+                .orElseThrow(() -> new FeatureFlagNotFoundException(id));
+
+        if (FeatureFlagStatus.OFF.equals(entity.getStatus())) {
+            throw new FeatureFlagNotUpdatedException(id);
         }
 
-        if (stateChanged) {
-            return entity.toDomainModel();
+        entity.setStatus(FeatureFlagStatus.OFF);
+        var featureFlag = entity.toDomainModel();
+        publisher.publishEvent(new FeatureFlagUpdatedEvent(featureFlag));
+        return featureFlag;
+    }
+
+    @Transactional
+    public FeatureFlag archive(Long id) {
+        FeatureFlagEntity entity = repository.findById(id)
+                .orElseThrow(() -> new FeatureFlagNotFoundException(id));
+
+        if (entity.getArchivedAt() != null) {
+            throw new FeatureFlagNotUpdatedException(id);
         }
 
-        throw new FeatureFlagNotUpdatedException(id);
+        entity.setArchivedAt(LocalDateTime.now());
+        var featureFlag = entity.toDomainModel();
+        publisher.publishEvent(new FeatureFlagUpdatedEvent(featureFlag));
+        return featureFlag;
     }
 }

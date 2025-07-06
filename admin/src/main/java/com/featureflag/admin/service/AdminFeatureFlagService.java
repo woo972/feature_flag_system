@@ -26,7 +26,14 @@ public class AdminFeatureFlagService {
         featureFlagService.register(request);
     }
 
-    public FeatureFlag update(Long id, UpdateFeatureFlagRequest request) {
-        return featureFlagService.update(id, request);
+    public FeatureFlag on(Long id) {
+        return featureFlagService.on(id);
     }
+    public FeatureFlag off(Long id) {
+        return featureFlagService.off(id);
+    }
+    public FeatureFlag archive(Long id) {
+        return featureFlagService.archive(id);
+    }
+
 }
