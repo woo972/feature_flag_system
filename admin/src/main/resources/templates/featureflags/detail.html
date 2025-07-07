@@ -3,129 +3,478 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Feature Flag 상세 정보</title>
+  <title>상세 정보</title>
   <link rel="stylesheet" href="/css/styles.css">
   <style>
+    :root {
+      --primary-color: #4C61F0;
+      --primary-hover: #3A4FD8;
+      --success-color: #0CA678;
+      --success-bg: #E6F7F2;
+      --danger-color: #E03131;
+      --danger-bg: #FFEBEE;
+      --warning-color: #F59F00;
+      --warning-bg: #FFF8E6;
+      --neutral-color: #6B7280;
+      --neutral-bg: #F3F4F6;
+      --text-primary: #1F2937;
+      --text-secondary: #4B5563;
+      --text-tertiary: #6B7280;
+      --border-color: #E5E7EB;
+      --card-bg: #FFFFFF;
+      --body-bg: #F9FAFB;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       line-height: 1.6;
-      color: #333;
-      background-color: #f8f9fa;
+      color: var(--text-primary);
+      background-color: var(--body-bg);
       margin: 0;
-      padding: 20px;
+      padding: 0;
     }
+
     .container {
-      max-width: 800px;
+      width: 100%;
+      max-width: 1200px;
       margin: 0 auto;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      padding: 20px;
+      padding: var(--spacing-md);
     }
+
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 10px;
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--border-color);
     }
+
     .header h1 {
       margin: 0;
-      font-size: 24px;
-      color: #333;
-    }
-    .back-link {
-      color: #0066cc;
-      text-decoration: none;
-    }
-    .back-link:hover {
-      text-decoration: underline;
-    }
-    .flag-header {
-      margin-bottom: 20px;
-    }
-    .flag-name {
-      font-size: 20px;
+      font-size: 1.5rem;
       font-weight: 600;
-      margin: 0 0 5px 0;
+      color: var(--text-primary);
     }
-    .flag-description {
-      color: #666;
-      margin: 0;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      color: var(--primary-color);
+      text-decoration: none;
       font-weight: 500;
+      font-size: 0.9rem;
+      transition: color 0.2s;
     }
+
+    .back-link:hover {
+      color: var(--primary-hover);
+    }
+
+    .back-link::before {
+      content: "←";
+      margin-right: var(--spacing-xs);
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .flag-header {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .flag-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .flag-description {
+      color: var(--text-secondary);
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .flag-status-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-top: var(--spacing-md);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 500;
+      line-height: 1;
+    }
+
     .status-on {
-      background-color: #e6f7e6;
-      color: #2e7d32;
+      background-color: var(--success-bg);
+      color: var(--success-color);
     }
+
     .status-off {
-      background-color: #ffebee;
-      color: #c62828;
+      background-color: var(--danger-bg);
+      color: var(--danger-color);
     }
-    .info-section {
-      margin-bottom: 20px;
+
+    .status-archived {
+      background-color: var(--neutral-bg);
+      color: var(--neutral-color);
     }
-    .info-section h2 {
-      font-size: 16px;
-      margin: 0 0 10px 0;
-      color: #555;
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0 0 var(--spacing-md) 0;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
     }
+
+    .section-title::before {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: 1rem;
+      background-color: var(--primary-color);
+      border-radius: var(--radius-sm);
+    }
+
     .info-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: var(--spacing-md);
     }
+
     .info-item {
-      border-bottom: 1px solid #eee;
-      padding-bottom: 8px;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: var(--spacing-xs);
     }
+
     .info-label {
-      color: #666;
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
     }
+
     .info-value {
       font-weight: 500;
+      color: var(--text-primary);
     }
-    .code-block {
-      background-color: #f5f5f5;
-      border-radius: 4px;
-      padding: 10px;
-      overflow-x: auto;
+
+    .rules-container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
     }
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
+
+    .rule-card {
+      background-color: var(--neutral-bg);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
+    }
+
+    .rule-title {
+      font-weight: 600;
+      margin-bottom: var(--spacing-xs);
+      color: var(--text-primary);
+    }
+
+    .rule-content {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 14px;
+    }
+
+    .empty-rules {
+      color: var(--text-tertiary);
+      font-style: italic;
+      padding: var(--spacing-md);
+      background-color: var(--neutral-bg);
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+
+    /* Toggle Switch Styles */
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--neutral-bg);
+      transition: .3s;
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 2px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: var(--shadow-sm);
+    }
+
+    input:checked + .toggle-slider {
+      background-color: var(--success-color);
+      border-color: var(--success-color);
+    }
+
+    input:focus + .toggle-slider {
+      box-shadow: 0 0 1px var(--success-color);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+    }
+
+    .toggle-label {
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+      align-items: center;
+      margin-top: var(--spacing-md);
+    }
+
+    .archive-btn {
+      background-color: var(--danger-color);
+      color: white;
+      border: none;
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    .archive-btn:hover {
+      background-color: #c62828;
+    }
+
+    .archive-btn:disabled {
+      background-color: var(--danger-bg);
+      color: var(--danger-color);
+      cursor: not-allowed;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: var(--card-bg);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      box-shadow: var(--shadow-md);
+      margin: var(--spacing-md);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: var(--danger-color);
+      font-size: 1.2rem;
+    }
+
+    .close-modal {
+      color: var(--text-tertiary);
+      font-size: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .close-modal:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .modal-body p {
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+    }
+
+    .modal-btn {
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 500;
+      border: none;
+      font-size: 0.9rem;
+    }
+
+    .cancel-btn {
+      background-color: var(--neutral-bg);
+      color: var(--text-primary);
+    }
+
+    .confirm-btn {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flag-status-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .archive-btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="header">
-    <h1>Feature Flag 상세 정보</h1>
-    <a th:href="@{/admin}" class="back-link">← 홈으로 이동</a>
+    <a th:href="@{/admin}" class="back-link">
+      <span>&lt;</span>
+    </a>
+    <h1>상세 정보</h1>
   </div>
 
-  <div class="flag-header">
-    <h2 class="flag-name" th:text="${featureFlag.name}">Feature Flag 이름</h2>
-    <p class="flag-description" th:text="${featureFlag.description}">Feature Flag 설명</p>
-    <div style="margin-top: 10px;">
-      <span th:if="${featureFlag.status.name() == 'ON'}" class="status-badge status-on">활성화</span>
-      <span th:if="${featureFlag.status.name() == 'OFF'}" class="status-badge status-off">비활성화</span>
+  <div class="card">
+    <div class="flag-header">
+      <h2 class="flag-name" th:text="${featureFlag.name}">Feature Flag 이름</h2>
+      <p class="flag-description" th:text="${featureFlag.description}">Feature Flag 설명</p>
+
+      <div class="flag-status-row">
+        <!-- Status Badge -->
+        <div>
+          <span th:if="${featureFlag.archivedAt != null}" class="status-badge status-archived">아카이브됨</span>
+          <span th:if="${featureFlag.archivedAt == null && featureFlag.status.name() == 'ON'}" class="status-badge status-on">활성화</span>
+          <span th:if="${featureFlag.archivedAt == null && featureFlag.status.name() == 'OFF'}" class="status-badge status-off">비활성화</span>
+        </div>
+
+        <!-- Toggle Switch and Archive Button -->
+        <div class="action-buttons" th:if="${featureFlag.archivedAt == null}">
+          <div class="toggle-container">
+            <label class="toggle-switch">
+              <input type="checkbox" id="statusToggle" th:checked="${featureFlag.status.name() == 'ON'}">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label" id="toggleLabel" th:text="${featureFlag.status.name() == 'ON' ? '활성화' : '비활성화'}">상태</span>
+          </div>
+
+          <button class="archive-btn" id="archiveBtn">아카이브</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="info-section">
-    <h2>기본 정보</h2>
+  <div class="card">
+    <h3 class="section-title">기본 정보</h3>
     <div class="info-grid">
       <div class="info-item">
         <span class="info-label">ID</span>
@@ -146,20 +495,140 @@
     </div>
   </div>
 
-  <div class="info-section">
-    <h2>타겟팅 규칙</h2>
-    <div th:if="${featureFlag.targetingRules != null && !featureFlag.targetingRules.isEmpty()}">
-      <div th:each="rule : ${featureFlag.rules}" style="margin-bottom: 10px;">
-        <div class="code-block">
-          <div style="font-weight: 500; margin-bottom: 5px;" th:text="${rule.getClass().getSimpleName()}">RegionRule</div>
-          <div style="color: #555;" th:text="${rule}">규칙 상세 정보</div>
-        </div>
+  <div class="card">
+    <h3 class="section-title">타겟팅 규칙</h3>
+    <div class="rules-container" th:if="${featureFlag.targetingRules != null && !featureFlag.targetingRules.isEmpty()}">
+      <div th:each="rule : ${featureFlag.rules}" class="rule-card">
+        <div class="rule-title" th:text="${rule.getClass().getSimpleName()}">RegionRule</div>
+        <div class="rule-content" th:text="${rule}">규칙 상세 정보</div>
       </div>
     </div>
-    <div th:if="${featureFlag.targetingRules == null || featureFlag.targetingRules.isEmpty()}" style="color: #666; font-style: italic;">
+    <div th:if="${featureFlag.targetingRules == null || featureFlag.targetingRules.isEmpty()}" class="empty-rules">
       타겟팅 규칙이 설정되지 않았습니다.
     </div>
   </div>
 </div>
+
+<!-- Archive Confirmation Modal -->
+<div id="archiveModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>주의: 아카이브 확인</h3>
+      <span class="close-modal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p><strong>이 작업은 되돌릴 수 없습니다.</strong></p>
+      <p>아카이브된 Feature Flag는 더 이상 활성화할 수 없으며, 시스템에서 평가되지 않습니다.</p>
+      <p>아카이브하기 전에 해당 Feature Flag를 사용하는 코드를 Clean-up 하십시오.</p>
+      <p>정말로 이 Feature Flag를 아카이브하시겠습니까?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn cancel-btn" id="cancelArchive">취소</button>
+      <button class="modal-btn confirm-btn" id="confirmArchive">아카이브</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toggle Switch Functionality
+    const statusToggle = document.getElementById('statusToggle');
+    const toggleLabel = document.getElementById('toggleLabel');
+    const flagId = [[${featureFlag.id}]];
+
+    if (statusToggle) {
+      statusToggle.addEventListener('change', function() {
+        const newStatus = this.checked ? 'on' : 'off';
+
+        // Create form for submission
+        const form = document.createElement('form');
+        form.method = 'PUT';
+        form.action = `/admin/feature-flags/${flagId}/${newStatus}`;
+
+        // Add method override for PUT
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'PUT';
+        form.appendChild(methodInput);
+
+        // Add CSRF token if needed
+        if (document.querySelector('meta[name="_csrf"]')) {
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = document.querySelector('meta[name="_csrf_parameter"]').content;
+          csrfInput.value = document.querySelector('meta[name="_csrf"]').content;
+          form.appendChild(csrfInput);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+      });
+    }
+
+    // Archive Button Functionality
+    const archiveBtn = document.getElementById('archiveBtn');
+    const archiveModal = document.getElementById('archiveModal');
+    const closeModal = document.querySelector('.close-modal');
+    const cancelArchive = document.getElementById('cancelArchive');
+    const confirmArchive = document.getElementById('confirmArchive');
+
+    if (archiveBtn) {
+      archiveBtn.addEventListener('click', function() {
+        archiveModal.style.display = 'flex';
+      });
+    }
+
+    // Close modal when clicking the X
+    if (closeModal) {
+      closeModal.addEventListener('click', function() {
+        archiveModal.style.display = 'none';
+      });
+    }
+
+    // Close modal when clicking Cancel
+    if (cancelArchive) {
+      cancelArchive.addEventListener('click', function() {
+        archiveModal.style.display = 'none';
+      });
+    }
+
+    // Handle archive confirmation
+    if (confirmArchive) {
+      confirmArchive.addEventListener('click', function() {
+        // Create form for submission
+        const form = document.createElement('form');
+        form.method = 'PUT';
+        form.action = `/admin/feature-flags/${flagId}/archive`;
+
+        // Add method override for PUT
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'PUT';
+        form.appendChild(methodInput);
+
+        // Add CSRF token if needed
+        if (document.querySelector('meta[name="_csrf"]')) {
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = document.querySelector('meta[name="_csrf_parameter"]').content;
+          csrfInput.value = document.querySelector('meta[name="_csrf"]').content;
+          form.appendChild(csrfInput);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+      });
+    }
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+      if (event.target === archiveModal) {
+        archiveModal.style.display = 'none';
+      }
+    });
+  });
+</script>
 </body>
 </html>
