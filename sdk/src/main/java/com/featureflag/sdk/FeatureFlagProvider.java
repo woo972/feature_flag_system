@@ -1,6 +1,5 @@
 package com.featureflag.sdk;
 
-import com.featureflag.sdk.api.FeatureFlagProvider;
 import com.featureflag.sdk.config.FeatureFlagCoreHttpClient;
 import com.featureflag.shared.model.FeatureFlag;
 import lombok.Builder;
@@ -14,11 +13,10 @@ import static java.util.Collections.emptyList;
 
 @Slf4j
 @Builder
-public class DefaultFeatureFlagProvider implements FeatureFlagProvider {
+public class FeatureFlagProvider {
 
     private final FeatureFlagCoreHttpClient httpClient;
 
-    @Override
     public List<FeatureFlag> fetchAll() {
         String response;
         try {

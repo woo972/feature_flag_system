@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,13 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
         }
 
         return Optional.ofNullable(featureFlag);
+    }
+
+    @Override
+    public void update(List<FeatureFlag> featureFlags) {
+        featureFlags.forEach(featureFlag ->
+                LOCAL_CACHE.put(featureFlag.getName(), featureFlag)
+        );
     }
 }
 
