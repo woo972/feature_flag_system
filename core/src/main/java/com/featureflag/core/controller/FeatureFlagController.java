@@ -40,6 +40,7 @@ public class FeatureFlagController {
 
     @GetMapping(path = "/event-stream/{client-id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sse(@PathVariable(value = "client-id", required = true) String clientId) {
+        log.debug("streaming to client {}", clientId);
         SseEmitter sseEmitter = new SseEmitter();
 
         emitters.put(clientId, sseEmitter);
@@ -62,6 +63,7 @@ public class FeatureFlagController {
 
     @EventListener
     public void handleFeatureFlagUpdated(FeatureFlagUpdatedEvent event) {
+        log.debug("feature flag updated: {}", event);
         emitters.forEach((clientId, emitter) -> {
             try {
                 emitter.send(SseEmitter.event()
