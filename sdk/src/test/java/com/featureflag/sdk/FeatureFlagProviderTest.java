@@ -44,4 +44,14 @@ class FeatureFlagProviderTest {
         assertEquals(1, resutl.size());
         assertEquals("dummy-flag-A", resutl.get(0).getName());
     }
+
+    @DisplayName("returns emtpy list when exception is thrown")
+    @Test
+    public void returnsEmptyListWhenExceptionIsThrown() throws IOException, InterruptedException {
+        when(featureFlagCoreHttpClient.get()).thenReturn(httpClient);
+        when(httpClient.send(FeatureFlagCoreHttpClient.GET_FEATURE_FLAGS, HttpResponse.BodyHandlers.ofString()))
+                .thenThrow(RuntimeException.class);
+        var resutl = sut.fetchAll();
+        assertEquals(0, resutl.size());
+    }
 }
