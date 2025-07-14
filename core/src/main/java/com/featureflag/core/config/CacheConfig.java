@@ -26,17 +26,14 @@ public class CacheConfig {
         public static final long DEFAULT_CACHE_TTL = 3600; // 1 hour in seconds
     }
 
-    @Value("${spring.redis.host:localhost}")
+    @Value("${spring.data.redis.host:localhost}")
     private String host;
 
-    @Value("${spring.redis.port:6379}")
+    @Value("${spring.data.redis.port:6379}")
     private int port;
 
     @Value("${spring.profiles.active:local}")
     private String active;
-
-    @Value("${spring.redis.redisson-prefix:redis://}")
-    private String redissonPrefix;
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
