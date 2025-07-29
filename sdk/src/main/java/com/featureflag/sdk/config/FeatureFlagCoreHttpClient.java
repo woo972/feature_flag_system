@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.time.Duration;
-import java.util.function.Supplier;
 
 public class FeatureFlagCoreHttpClient {
     public static final ObjectMapper JSON_MAPPER = new ObjectMapper();

@@ -1,7 +1,6 @@
 package com.featureflag.shared.model;
 
 import lombok.*;
-
 import java.util.List;
 import java.util.Map;
 

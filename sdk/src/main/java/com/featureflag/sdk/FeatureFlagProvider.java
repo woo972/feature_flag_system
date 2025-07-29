@@ -4,8 +4,6 @@ import com.featureflag.sdk.config.FeatureFlagCoreHttpClient;
 import com.featureflag.shared.model.FeatureFlag;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;

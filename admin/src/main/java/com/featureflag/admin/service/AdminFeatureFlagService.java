@@ -2,7 +2,6 @@ package com.featureflag.admin.service;
 
 import com.featureflag.core.service.FeatureFlagService;
 import com.featureflag.core.service.RegisterFeatureFlagRequest;
-import com.featureflag.core.service.UpdateFeatureFlagRequest;
 import com.featureflag.shared.model.FeatureFlag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

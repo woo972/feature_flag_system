@@ -1,8 +1,6 @@
 package com.featureflag.shared.model;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
