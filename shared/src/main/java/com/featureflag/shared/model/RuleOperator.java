@@ -1,15 +1,31 @@
 package com.featureflag.shared.model;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.*;
 import java.util.function.BiFunction;
 
 @RequiredArgsConstructor
 public enum RuleOperator {
-    IN(String::equals),
-    NOT_IN((String expectedValue, String actualValue) -> !expectedValue.equals(actualValue)),
-    EQUAL(String::equals),
-    NOT_EQUAL((String expectedValue, String actualValue) -> !expectedValue.equals(actualValue)),
-    GREATER_THAN((String expectedValue, String actualValue) -> {
+    IN((List<String> expectedValues, String actualValue) -> expectedValues.stream().anyMatch(
+            expectedValue -> expectedValue.equalsIgnoreCase(actualValue)
+    )),
+    NOT_IN((List<String> expectedValues, String actualValue) -> expectedValues.stream().noneMatch(
+            expectedValue -> expectedValue.equalsIgnoreCase(actualValue)
+    )),
+    EQUAL((List<String> expectedValues, String actualValue) -> {
+        if(expectedValues.size() != 1) return false;
+        var expectedValue = expectedValues.getFirst();
+        return expectedValue.equalsIgnoreCase(actualValue);
+    }),
+    NOT_EQUAL((List<String> expectedValues, String actualValue) -> {
+        if(expectedValues.size() != 1) return false;
+        var expectedValue = expectedValues.getFirst();
+        return !expectedValue.equalsIgnoreCase(actualValue);
+    }),
+    GREATER_THAN((List<String> expectedValues, String actualValue) -> {
+        if(expectedValues.size() != 1) return false;
+        var expectedValue = expectedValues.getFirst();
         try {
             var expected = Double.parseDouble(expectedValue);
             var actual = Double.parseDouble(actualValue);
@@ -18,7 +34,9 @@ public enum RuleOperator {
             return expectedValue.compareTo(actualValue) < 0;
         }
     }),
-    LESS_THAN((String expectedValue, String actualValue) -> {
+    LESS_THAN((List<String> expectedValues, String actualValue) -> {
+        if(expectedValues.size() != 1) return false;
+        var expectedValue = expectedValues.getFirst();
         try {
             var expected = Double.parseDouble(expectedValue);
             var actual = Double.parseDouble(actualValue);
@@ -27,7 +45,9 @@ public enum RuleOperator {
             return expectedValue.compareTo(actualValue) > 0;
         }
     }),
-    GREATER_THAN_EQUAL((String expectedValue, String actualValue) -> {
+    GREATER_THAN_EQUAL((List<String> expectedValues, String actualValue) -> {
+        if(expectedValues.size() != 1) return false;
+        var expectedValue = expectedValues.getFirst();
         try {
             var expected = Double.parseDouble(expectedValue);
             var actual = Double.parseDouble(actualValue);
@@ -36,7 +56,9 @@ public enum RuleOperator {
             return expectedValue.compareTo(actualValue) <= 0;
         }
     }),
-    LESS_THAN_EQUAL((String expectedValue, String actualValue) -> {
+    LESS_THAN_EQUAL((List<String> expectedValues, String actualValue) -> {
+        if(expectedValues.size() != 1) return false;
+        var expectedValue = expectedValues.getFirst();
         try {
             var expected = Double.parseDouble(expectedValue);
             var actual = Double.parseDouble(actualValue);
@@ -47,10 +69,10 @@ public enum RuleOperator {
     }),
     ;
 
-    private final BiFunction<String, String, Boolean> matcher;
+    private final BiFunction<List<String>, String, Boolean> matcher;
 
-    public boolean matches(String expectedValue, String actualValue) {
-        return matcher.apply(expectedValue, actualValue);
+    public boolean matches(List<String> expectedValues, String actualValue) {
+        return matcher.apply(expectedValues, actualValue);
     }
 }
 

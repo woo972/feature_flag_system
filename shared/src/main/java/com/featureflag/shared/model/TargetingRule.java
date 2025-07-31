@@ -1,6 +1,7 @@
 package com.featureflag.shared.model;
 
 import lombok.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -20,13 +21,7 @@ public class TargetingRule {
         if (values == null || values.isEmpty()) return false;
         var actualValue = criteria.get(name);
 
-        if(RuleOperator.IN.equals(operator)) {
-            return values.stream().anyMatch(expectedValue -> operator.matches(expectedValue, actualValue));
-        }else if(RuleOperator.NOT_IN.equals(operator)) {
-            return values.stream().allMatch(expectedValue -> operator.matches(expectedValue, actualValue));
-        }
-
-        return operator.matches(values.getFirst(), actualValue);
+        return operator.matches(values, actualValue);
     }
 }
 
