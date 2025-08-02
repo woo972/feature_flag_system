@@ -1,18 +1,16 @@
 # Feature Flag System
 
-A comprehensive feature flag management system built with Java 21 and Spring Boot.
-
 ## Project Structure
 
 - `core`: Core APIs and business logic for feature flag management
-- `dashboard`: Admin dashboard for managing feature flags
+- `admin`: Admin dashboard for managing feature flags
 - `sdk`: Client SDK for integrating feature flags into applications
 - `shared`: Shared utilities and common code
 
 ## Requirements
 
-- Java 21 or higher
-- Gradle 8.5 or higher
+- Java 21
+- Gradle 8.5
 
 ## Building the Project
 
@@ -24,9 +22,11 @@ A comprehensive feature flag management system built with Java 21 and Spring Boo
 
 ### Core Module
 Contains the core business logic and APIs for feature flag management.
+Needs Database and Redis.
 
-### Dashboard Module
+### Admin Module
 Administrative interface for managing feature flags, built with Spring Boot and Thymeleaf.
+Frontend will be built with other frameworks/libraries like React.
 
 ### SDK Module
 Client library for applications to integrate with the feature flag system.
