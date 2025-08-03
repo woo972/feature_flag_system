@@ -1,41 +1,35 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
+    <meta charset="UTF-8">
     <title>Feature Flag 등록</title>
-    <link rel="stylesheet" href="/css/admin.css"/>
-    <style>
-        .rule-container { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
-        .rule-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .remove-rule { background-color: #f44336; color: white; border: none; padding: 5px 10px; cursor: pointer; }
-        .add-rule { margin-bottom: 15px; background-color: #4CAF50; color: white; border: none; padding: 8px 12px; cursor: pointer; }
-        .rule-values { margin-top: 10px; }
-        .rule-value { display: flex; margin-bottom: 5px; }
-        .rule-value input { flex-grow: 1; margin-right: 5px; }
-        .remove-value { background-color: #ff9800; color: white; border: none; padding: 5px; cursor: pointer; }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body>
-<h2>Feature Flag 등록</h2>
-<form th:action="@{/admin/feature-flags}" th:object="${registerFeatureFlagRequest}" method="post">
-    <div>
-        <label for="name">이름</label>
-        <input type="text" id="name" th:field="*{name}" required/>
-    </div>
-    <div>
-        <label for="description">설명</label>
-        <input type="text" id="description" th:field="*{description}"/>
-    </div>
+<body class="bg-light">
+<div class="container my-5">
+    <h2 class="mb-4">Feature Flag 등록</h2>
+    <form th:action="@{/admin/feature-flags}" th:object="${registerFeatureFlagRequest}" method="post">
+        <div class="mb-3">
+            <label for="name" class="form-label">이름</label>
+            <input type="text" id="name" th:field="*{name}" class="form-control" required />
+        </div>
+        <div class="mb-4">
+            <label for="description" class="form-label">설명</label>
+            <input type="text" id="description" th:field="*{description}" class="form-control" />
+        </div>
 
-    <h2>타겟팅 규칙</h2>
-    <div id="rules-container">
-        <!-- 여기에 규칙이 동적으로 추가됩니다 -->
-    </div>
-    <button type="button" class="add-rule" onclick="addRule()">+ 규칙 추가</button>
+        <h4 class="mb-3">타겟팅 규칙</h4>
+        <div id="rules-container"></div>
+        <button type="button" class="btn btn-success mb-3" onclick="addRule()">+ 규칙 추가</button>
 
-    <!-- 필요한 추가 필드가 있다면 여기에 -->
-    <button type="submit">등록</button>
-    <a th:href="@{/admin}">홈으로 이동</a>
-</form>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">등록</button>
+            <a th:href="@{/admin}" class="btn btn-secondary">홈으로 이동</a>
+        </div>
+    </form>
+</div>
+
 <script>
     let ruleCount = 0;
 
@@ -44,21 +38,23 @@
         const ruleId = ruleCount++;
 
         const ruleDiv = document.createElement('div');
-        ruleDiv.className = 'rule-container';
+        ruleDiv.className = 'border p-3 rounded mb-4 bg-white';
         ruleDiv.id = `rule-${ruleId}`;
 
         ruleDiv.innerHTML = `
-            <div class="rule-header">
-                <h3>규칙 #${ruleId + 1}</h3>
-                <button type="button" class="remove-rule" onclick="removeRule(${ruleId})">삭제</button>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">규칙 #${ruleId + 1}</h5>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeRule(${ruleId})">삭제</button>
             </div>
-            <div class="form-group">
-                <label for="rules[${ruleId}].name">속성 이름</label>
-                <input type="text" id="rules[${ruleId}].name" name="targetingRules[${ruleId}].name" required/>
+
+            <div class="mb-3">
+                <label for="rules[${ruleId}].name" class="form-label">속성 이름</label>
+                <input type="text" id="rules[${ruleId}].name" name="targetingRules[${ruleId}].name" class="form-control" required />
             </div>
-            <div class="form-group">
-                <label for="rules[${ruleId}].operator">연산자</label>
-                <select id="rules[${ruleId}].operator" name="targetingRules[${ruleId}].operator" required>
+
+            <div class="mb-3">
+                <label for="rules[${ruleId}].operator" class="form-label">연산자</label>
+                <select id="rules[${ruleId}].operator" name="targetingRules[${ruleId}].operator" class="form-select" required>
                     <option value="IN">포함(IN)</option>
                     <option value="NOT_IN">미포함(NOT_IN)</option>
                     <option value="EQUAL">일치(EQUAL)</option>
@@ -69,24 +65,24 @@
                     <option value="LESS_THAN_EQUAL">이하(LESS_THAN_EQUAL)</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>값</label>
-                <div id="values-container-${ruleId}" class="rule-values">
-                    <div class="rule-value">
-                        <input type="text" name="targetingRules[${ruleId}].values[0]" required/>
+
+            <div class="mb-3">
+                <label class="form-label">값</label>
+                <div id="values-container-${ruleId}" class="d-flex flex-column gap-2">
+                    <div class="input-group">
+                        <input type="text" name="targetingRules[${ruleId}].values[0]" class="form-control" required />
                     </div>
                 </div>
-                <button type="button" onclick="addValue(${ruleId})">+ 값 추가</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="addValue(${ruleId})">+ 값 추가</button>
             </div>
         `;
 
+        container.appendChild(ruleDiv);
     }
 
     function removeRule(ruleId) {
         const ruleDiv = document.getElementById(`rule-${ruleId}`);
         ruleDiv.remove();
-
-        // 규칙 번호 재정렬
         updateRuleIndexes();
     }
 
@@ -95,25 +91,23 @@
         const valueCount = valuesContainer.children.length;
 
         const valueDiv = document.createElement('div');
-        valueDiv.className = 'rule-value';
+        valueDiv.className = 'input-group';
         valueDiv.innerHTML = `
-            <input type="text" name="targetingRules[${ruleId}].values[${valueCount}]" required/>
-            <button type="button" class="remove-value" onclick="this.parentElement.remove()">삭제</button>
+            <input type="text" name="targetingRules[${ruleId}].values[${valueCount}]" class="form-control" required />
+            <button type="button" class="btn btn-warning" onclick="this.closest('.input-group').remove()">삭제</button>
         `;
 
         valuesContainer.appendChild(valueDiv);
     }
 
     function updateRuleIndexes() {
-        const containers = document.querySelectorAll('.rule-container');
+        const containers = document.querySelectorAll('.border');
         containers.forEach((container, index) => {
-            // 헤더 업데이트
-            container.querySelector('h3').textContent = `규칙 #${index + 1}`;
+            container.querySelector('h5').textContent = `규칙 #${index + 1}`;
 
-            // 입력 필드 이름 업데이트
             const nameInput = container.querySelector('[id^="rules["]');
             const operatorSelect = container.querySelector('select');
-            const valueInputs = container.querySelectorAll('.rule-value input');
+            const valueInputs = container.querySelectorAll('.form-control');
 
             nameInput.name = `targetingRules[${index}].name`;
             nameInput.id = `rules[${index}].name`;
@@ -122,24 +116,21 @@
             operatorSelect.id = `rules[${index}].operator`;
 
             valueInputs.forEach((input, valueIndex) => {
+                if (!input.closest('.input-group').querySelector('button')) return;
                 input.name = `targetingRules[${index}].values[${valueIndex}]`;
             });
 
-            // 값 컨테이너 ID 업데이트
             const valuesContainer = container.querySelector('[id^="values-container-"]');
             valuesContainer.id = `values-container-${index}`;
 
-            // 버튼 onclick 업데이트
-            container.querySelector('.remove-rule').setAttribute('onclick', `removeRule(${index})`);
-            container.querySelector('button[onclick^="addValue"]').setAttribute('onclick', `addValue(${index})`);
+            container.querySelector('.btn-danger').setAttribute('onclick', `removeRule(${index})`);
+            container.querySelector('button.btn-outline-secondary').setAttribute('onclick', `addValue(${index})`);
 
-            // 컨테이너 ID 업데이트
             container.id = `rule-${index}`;
         });
     }
 
-    // 페이지 로드 시 기본 규칙 하나 추가
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         addRule();
     });
 </script>
