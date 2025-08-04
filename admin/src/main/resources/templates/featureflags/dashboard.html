@@ -61,8 +61,11 @@
                     <td th:text="${flag.name}">Feature Flag 이름</td>
                     <td th:text="${#strings.abbreviate(flag.description, 50)}">설명...</td>
                     <td>
-                        <span th:if="${flag.status.name() == 'ON'}" class="badge bg-success">ON</span>
-                        <span th:if="${flag.status.name() == 'OFF'}" class="badge bg-danger">OFF</span>
+                        <span th:text="${flag.archivedAt == null}">
+                            <span th:if="${flag.status.name() == 'ON'}" class="badge bg-success">ON</span>
+                            <span th:if="${flag.status.name() == 'OFF'}" class="badge bg-danger">OFF</span>
+                        </span>
+                        <span th:text="${flag.archivedAt != null}" class="badge bg-warning">ARCHIVED</span>
                     </td>
                     <td th:text="${#temporals.format(flag.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01</td>
                 </tr>
