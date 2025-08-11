@@ -78,7 +78,7 @@ public class AdminController {
         return "redirect:/admin/feature-flags/" + id;
     }
 
-    @PutMapping("/feature-flags/{id}/archive")
+    @PostMapping("/feature-flags/{id}/archive")
     public String archive(@PathVariable(value = "id", required = true) Long id, Model model) {
         adminFeatureFlagService.archive(id);
         return "redirect:/admin/feature-flags/" + id;
