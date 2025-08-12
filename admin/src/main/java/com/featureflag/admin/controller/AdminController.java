@@ -66,13 +66,13 @@ public class AdminController {
         return ADMIN_VIEW_BASE_PATH + "/detail";
     }
 
-    @PutMapping("/feature-flags/{id}/on")
+    @PostMapping("/feature-flags/{id}/on")
     public String on(@PathVariable(value = "id", required = true) Long id, Model model) {
         adminFeatureFlagService.on(id);
         return "redirect:/admin/feature-flags/" + id;
     }
 
-    @PutMapping("/feature-flags/{id}/off")
+    @PostMapping("/feature-flags/{id}/off")
     public String off(@PathVariable(value = "id", required = true) Long id, Model model) {
         adminFeatureFlagService.off(id);
         return "redirect:/admin/feature-flags/" + id;
