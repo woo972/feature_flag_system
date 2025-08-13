@@ -20,9 +20,8 @@
       <p class="text-muted mb-3" th:text="${featureFlag.description}">설명</p>
       <div class="d-flex align-items-center gap-3 flex-wrap">
         <div>
-          <span th:if="${featureFlag.archivedAt != null}" class="badge bg-secondary">아카이브됨</span>
           <span th:if="${featureFlag.archivedAt == null && featureFlag.status.name() == 'ON'}" class="badge bg-success">활성화</span>
-          <span th:if="${featureFlag.archivedAt == null && featureFlag.status.name() == 'OFF'}" class="badge bg-danger">비활성화</span>
+          <span th:if="${featureFlag.archivedAt == null && featureFlag.status.name() == 'OFF'}" class="badge bg-warning">비활성화</span>
         </div>
 
         <div th:if="${featureFlag.archivedAt == null}" class="d-flex gap-3">
