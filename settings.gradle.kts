@@ -12,5 +12,6 @@ include(
     "core",
     "admin",
     "sdk",
-    "shared"
+    "shared",
+    "sample"
 )
