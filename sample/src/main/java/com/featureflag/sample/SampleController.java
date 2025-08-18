@@ -22,6 +22,11 @@ public class SampleController {
         return String.valueOf(flagTest(flag, key, value));
     }
 
+    @GetMapping("/init")
+    public void init(){
+        featureFlagClient.initialize();
+    }
+
     public boolean flagTest(String flag, String key, String value) {
         return featureFlagClient.evaluate(flag, Map.of(key, value));
     }
