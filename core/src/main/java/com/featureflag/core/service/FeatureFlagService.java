@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -57,6 +57,15 @@ public class FeatureFlagService {
         return repository.findAll(pageable)
                 .map(FeatureFlagEntity::toDomainModel);
     }
+
+    @Transactional(readOnly = true)
+    public List<FeatureFlag> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(FeatureFlagEntity::toDomainModel)
+                .toList();
+    }
+
 
     @Transactional
     public FeatureFlag on(Long id) {

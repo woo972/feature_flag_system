@@ -3,6 +3,7 @@ package com.featureflag.core.controller;
 import com.featureflag.core.event.FeatureFlagUpdatedEvent;
 import com.featureflag.core.service.FeatureFlagService;
 import com.featureflag.shared.config.JacksonConfig;
+import com.featureflag.shared.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -11,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -23,6 +24,11 @@ public class FeatureFlagController {
     private static final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     private final FeatureFlagService featureFlagService;
+
+    @GetMapping
+    public ResponseEntity<List<FeatureFlag>> list() {
+        return ResponseEntity.ok(featureFlagService.findAll());
+    }
 
     @GetMapping("/evaluate/{flag-id}")
     public ResponseEntity<Boolean> evaluate(
