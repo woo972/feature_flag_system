@@ -8,7 +8,7 @@ import java.net.http.HttpRequest;
 import java.time.Duration;
 
 public class FeatureFlagCoreHttpClient {
-    public static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+    public static final ObjectMapper JSON_MAPPER = new JsonConfig().createObjectMapper();
 
     private static final Duration CONNECTION_TIMOUT = Duration.ofSeconds(3);
     private static final Duration READ_TIMOUT = Duration.ofSeconds(3);

@@ -1,5 +1,7 @@
 package com.featureflag.sample;
 
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.jsr310.*;
 import com.featureflag.sdk.*;
 import com.featureflag.sdk.api.*;
 import com.featureflag.sdk.config.*;
@@ -32,5 +34,13 @@ public class SampleFeatureFlagConfig {
             this.featureFlagClient = featureFlagClient;
             this.featureFlagClient.initialize();
         }
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return objectMapper;
     }
 }

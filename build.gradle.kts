@@ -22,6 +22,7 @@ subprojects {
     dependencies {
         implementation("org.slf4j:slf4j-api:2.0.9")
         implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
+        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
         implementation("org.apache.commons:commons-lang3:3.13.0")
 
         compileOnly("org.projectlombok:lombok:1.18.30")
