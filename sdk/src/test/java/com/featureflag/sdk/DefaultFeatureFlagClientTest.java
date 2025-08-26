@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-class SimpleFeatureFlagClientTest {
+class DefaultFeatureFlagClientTest {
 
     FeatureFlagClient sut;
     FeatureFlagProvider provider = Mockito.mock(FeatureFlagProvider.class);
@@ -24,7 +24,7 @@ class SimpleFeatureFlagClientTest {
 
     @BeforeEach
     public void setUp() {
-        sut = SimpleFeatureFlagClient
+        sut = DefaultFeatureFlagClient
                 .builder()
                 .cache(cache)
                 .provider(provider)
@@ -85,7 +85,7 @@ class SimpleFeatureFlagClientTest {
                 .thenReturn(initialFlags)
                 .thenReturn(updatedFlags);
 
-        SimpleFeatureFlagClient client = SimpleFeatureFlagClient.builder()
+        DefaultFeatureFlagClient client = DefaultFeatureFlagClient.builder()
                 .cache(cache)
                 .provider(provider)
                 .build();

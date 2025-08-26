@@ -5,7 +5,6 @@ import com.fasterxml.jackson.datatype.jsr310.*;
 import com.featureflag.sdk.*;
 import com.featureflag.sdk.api.*;
 import com.featureflag.sdk.config.*;
-import lombok.*;
 import org.springframework.context.annotation.*;
 
 @Configuration
@@ -13,7 +12,7 @@ public class SampleFeatureFlagConfig {
 
     @Bean
     public FeatureFlagClient featureFlagClient() {
-        return SimpleFeatureFlagClient.builder()
+        return DefaultFeatureFlagClient.builder()
                 .cache(new DefaultFeatureFlagLocalCache())
                 .provider(FeatureFlagProvider.builder()
                         .httpClient(new FeatureFlagCoreHttpClient())

@@ -10,7 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
 @Slf4j
-public class SimpleFeatureFlagClient implements FeatureFlagClient, AutoCloseable {
+public class DefaultFeatureFlagClient implements FeatureFlagClient, AutoCloseable {
 
     private FeatureFlagCache cache;
     private FeatureFlagProvider provider;
@@ -18,7 +18,7 @@ public class SimpleFeatureFlagClient implements FeatureFlagClient, AutoCloseable
     private ScheduledFuture<?> future;
 
     @Builder
-    public SimpleFeatureFlagClient(FeatureFlagCache cache, FeatureFlagProvider provider) {
+    public DefaultFeatureFlagClient(FeatureFlagCache cache, FeatureFlagProvider provider) {
         this.cache = cache;
         this.provider = provider;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(
