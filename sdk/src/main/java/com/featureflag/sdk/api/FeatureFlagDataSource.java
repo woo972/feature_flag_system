@@ -6,5 +6,5 @@ import java.util.*;
 
 public interface FeatureFlagDataSource {
     FeatureFlag get(String featureFlagName);
-    List<String> getAllFeatureFlagNames();
+    List<FeatureFlag> getAll();
 }

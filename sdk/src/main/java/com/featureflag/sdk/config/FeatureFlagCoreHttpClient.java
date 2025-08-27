@@ -21,7 +21,7 @@ public class FeatureFlagCoreHttpClient {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
-    public HttpClient get() {
+    public static HttpClient get() {
         return httpClient;
     }
 
