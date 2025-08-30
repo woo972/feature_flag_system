@@ -9,8 +9,5 @@ public interface FeatureFlagCache {
     void load(List<FeatureFlag> featureFlags);
     Optional<FeatureFlag> get(String featureFlagName);
     void invalidate();
-    boolean isInitialized();
-    void update(List<FeatureFlag> featureFlags);
-    void put(String featureFlagName, FeatureFlag featureFlag);
-    void initialize();
+    void initialize(List<FeatureFlag> featureFlags);
 }

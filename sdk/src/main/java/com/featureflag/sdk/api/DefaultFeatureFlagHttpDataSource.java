@@ -2,7 +2,6 @@ package com.featureflag.sdk.api;
 
 import com.featureflag.sdk.config.*;
 import com.featureflag.shared.model.*;
-
 import java.io.*;
 import java.net.http.*;
 import java.util.*;

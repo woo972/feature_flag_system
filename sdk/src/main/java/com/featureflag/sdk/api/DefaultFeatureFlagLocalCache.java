@@ -1,6 +1,5 @@
-package com.featureflag.sdk;
+package com.featureflag.sdk.api;
 
-import com.featureflag.sdk.api.FeatureFlagCache;
 import com.featureflag.shared.model.FeatureFlag;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -19,6 +18,13 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
             .maximumSize(1000)
             .recordStats()
             .build();
+
+    @Override
+    public void initialize(List<FeatureFlag> featureFlags) {
+        LOCAL_CACHE.invalidateAll();
+        load(featureFlags);
+        initialized = true;
+    }
 
     /**
      * 모든 캐시 데이터를 무효화합니다.
@@ -41,8 +47,6 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
         featureFlags.forEach(featureFlag -> {
             LOCAL_CACHE.put(featureFlag.getName(), featureFlag);
         });
-
-        this.initialized = true;
     }
 
     @Override
@@ -53,13 +57,6 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
         }
 
         return Optional.ofNullable(featureFlag);
-    }
-
-    @Override
-    public void update(List<FeatureFlag> featureFlags) {
-        featureFlags.forEach(featureFlag ->
-                LOCAL_CACHE.put(featureFlag.getName(), featureFlag)
-        );
     }
 }
 

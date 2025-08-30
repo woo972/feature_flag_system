@@ -4,5 +4,5 @@ import java.util.Map;
 
 public interface FeatureFlagClient {
     void initialize();
-    boolean evaluate(String featureFlagName, Map<String, String> criteria);
+    boolean isEnabled(String featureFlagName, Map<String, String> criteria);
 }

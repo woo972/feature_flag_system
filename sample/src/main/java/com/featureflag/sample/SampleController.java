@@ -28,6 +28,6 @@ public class SampleController {
     }
 
     public boolean flagTest(String flag, String key, String value) {
-        return featureFlagClient.evaluate(flag, Map.of(key, value));
+        return featureFlagClient.isEnabled(flag, Map.of(key, value));
     }
 }

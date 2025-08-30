@@ -2,9 +2,7 @@ package com.featureflag.sample;
 
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.*;
-import com.featureflag.sdk.*;
 import com.featureflag.sdk.api.*;
-import com.featureflag.sdk.config.*;
 import org.springframework.context.annotation.*;
 
 @Configuration
@@ -14,9 +12,6 @@ public class SampleFeatureFlagConfig {
     public FeatureFlagClient featureFlagClient() {
         return DefaultFeatureFlagClient.builder()
                 .cache(new DefaultFeatureFlagLocalCache())
-                .provider(FeatureFlagProvider.builder()
-                        .httpClient(new FeatureFlagCoreHttpClient())
-                        .build())
                 .build();
     }
 
