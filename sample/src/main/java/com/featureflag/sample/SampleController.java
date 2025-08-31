@@ -24,10 +24,12 @@ public class SampleController {
 
     @GetMapping("/init")
     public void init(){
+        log.info("flag init");
         featureFlagClient.initialize();
     }
 
     public boolean flagTest(String flag, String key, String value) {
+        log.info("flag test");
         return featureFlagClient.isEnabled(flag, Map.of(key, value));
     }
 }

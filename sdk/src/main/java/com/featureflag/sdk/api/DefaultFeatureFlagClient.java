@@ -2,6 +2,7 @@ package com.featureflag.sdk.api;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+
 import java.util.*;
 
 @Slf4j
@@ -12,9 +13,22 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
 
     @Builder
     public DefaultFeatureFlagClient(FeatureFlagDataSource source, FeatureFlagCache cache, FeatureFlagChangeScheduler scheduler) {
+        if (source == null) {
+            source = new DefaultFeatureFlagHttpDataSource();
+        }
+        if (cache == null) {
+            cache = new DefaultFeatureFlagLocalCache();
+        }
+        if (scheduler == null) {
+            scheduler = new DefaultFeatureFlagScheduler();
+        }
         this.source = source;
         this.cache = cache;
         this.scheduler = scheduler;
+        log.info("Feature flag client initialized. data source: {}, cache: {}, scheduler: {}",
+                source.getClass().getSimpleName(),
+                cache.getClass().getSimpleName(),
+                scheduler.getClass().getSimpleName());
     }
 
     @Override

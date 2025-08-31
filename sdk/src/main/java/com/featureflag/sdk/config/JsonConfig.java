@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.datatype.jsr310.*;
 
 public class JsonConfig {
-    public ObjectMapper createObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    public static ObjectMapper getObjectMapper() {
         return objectMapper;
     }
 }

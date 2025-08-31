@@ -24,6 +24,7 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
         LOCAL_CACHE.invalidateAll();
         load(featureFlags);
         initialized = true;
+        log.info("Feature flag local cache initialized. feature flag size: {}", featureFlags.size());
     }
 
     /**
@@ -43,6 +44,8 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
         if (featureFlags == null || featureFlags.isEmpty()) {
             return;
         }
+
+        log.debug("Feature flag cache loaded. feature flag size: {}", featureFlags.size());
 
         featureFlags.forEach(featureFlag -> {
             LOCAL_CACHE.put(featureFlag.getName(), featureFlag);
