@@ -1,5 +1,6 @@
 package com.featureflag.sdk.api;
 
+import com.featureflag.sdk.config.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 
@@ -14,7 +15,7 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
     @Builder
     public DefaultFeatureFlagClient(FeatureFlagDataSource source, FeatureFlagCache cache, FeatureFlagChangeScheduler scheduler) {
         if (source == null) {
-            source = new DefaultFeatureFlagHttpDataSource();
+            source = new DefaultFeatureFlagHttpDataSource(new FeatureFlagCoreHttpClient());
         }
         if (cache == null) {
             cache = new DefaultFeatureFlagLocalCache();
@@ -33,9 +34,9 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
 
     @Override
     public void initialize() {
-        var featureFlags = source.getAll();
+        var featureFlags = source.getFeatureFlags();
         cache.initialize(featureFlags);
-        scheduler.initialize(() -> cache.load(source.getAll()));
+        scheduler.initialize(() -> cache.load(source.getFeatureFlags()));
     }
 
     @Override

@@ -1,12 +1,14 @@
 package com.featureflag.sdk.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.*;
+import lombok.extern.slf4j.*;
 
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
+import java.net.http.*;
 import java.time.Duration;
+import java.util.*;
 
+@Slf4j
 public class FeatureFlagCoreHttpClient {
     public static final int MAX_RETRIES = 3;
     private static final Duration CONNECTION_TIMOUT = Duration.ofSeconds(3);
@@ -19,16 +21,42 @@ public class FeatureFlagCoreHttpClient {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
-    public static HttpClient get() {
-        return httpClient;
+    public <T> T get(String url, Map<String, List<String>> headers) {
+        int retryCount = 0;
+        while (retryCount < MAX_RETRIES) {
+            try {
+                HttpRequest request = withHeaders(HttpRequest.newBuilder()
+                                .uri(URI.create(url))
+                                .GET()
+                                .timeout(READ_TIMOUT),
+                        headers
+                ).build();
+
+                var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() >= 200 && response.statusCode() < 400) {
+                    if(response.statusCode() == 304){
+                        log.debug("Feature flags not modified");
+                        return null;
+                    }
+                    return JsonConfig.getObjectMapper().readValue(response.body(), new TypeReference<>() {});
+                }
+            } catch (Exception e) {
+                log.warn("Http request failed. {} times. url: {}", ++retryCount, url, e);
+            }
+        }
+        return null;
     }
 
-    public static final HttpRequest GET_FEATURE_FLAGS = HttpRequest.newBuilder()
-            .uri(URI.create(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH))
-            .GET()
-            .header("Content-Type", "application/json")
-            .timeout(READ_TIMOUT)
-            .build();
-
-
+    private HttpRequest.Builder withHeaders(HttpRequest.Builder builder, Map<String, List<String>> headers) {
+        if (headers != null) {
+            headers.forEach((key, values) -> {
+                if (values != null) {
+                    values.forEach(value -> {
+                        builder.header(key, value);
+                    });
+                }
+            });
+        }
+        return builder;
+    }
 }
