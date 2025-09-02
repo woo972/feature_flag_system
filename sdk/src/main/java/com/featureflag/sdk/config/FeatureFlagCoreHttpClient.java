@@ -13,7 +13,6 @@ public class FeatureFlagCoreHttpClient {
     public static final int MAX_RETRIES = 3;
     private static final Duration CONNECTION_TIMOUT = Duration.ofSeconds(3);
     private static final Duration READ_TIMOUT = Duration.ofSeconds(3);
-    private static final int DEFAULT_RETRY_INTERVAL = 3;
 
     private static final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(CONNECTION_TIMOUT)
@@ -34,14 +33,15 @@ public class FeatureFlagCoreHttpClient {
 
                 var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
                 if (response.statusCode() >= 200 && response.statusCode() < 400) {
-                    if(response.statusCode() == 304){
-                        log.debug("Feature flags not modified");
+                    if (response.statusCode() == 304) {
+                        log.debug("data not modified");
                         return null;
                     }
                     return JsonConfig.getObjectMapper().readValue(response.body(), new TypeReference<>() {});
                 }
             } catch (Exception e) {
-                log.warn("Http request failed. {} times. url: {}", ++retryCount, url, e);
+                log.warn("Http request failed. {} times. url: {}", retryCount + 1, url, e);
+                retryCount++;
             }
         }
         return null;
