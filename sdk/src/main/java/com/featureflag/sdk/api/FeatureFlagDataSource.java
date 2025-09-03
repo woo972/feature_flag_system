@@ -6,5 +6,6 @@ import java.util.*;
 
 public interface FeatureFlagDataSource {
     FeatureFlag get(String featureFlagName);
-    List<FeatureFlag> getFeatureFlags();
+    Optional<List<FeatureFlag>> getFeatureFlags();
+    Optional<List<FeatureFlag>> getFeatureFlags(Optional<List<FeatureFlag>> featureFlags);
 }

@@ -36,7 +36,11 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
     public void initialize() {
         var featureFlags = source.getFeatureFlags();
         cache.initialize(featureFlags);
-        scheduler.initialize(() -> cache.load(source.getFeatureFlags()));
+        scheduler.initialize(() -> {
+            var cachedFeatureFlags = cache.getFeatureFlags();
+            cachedFeatureFlags = source.getFeatureFlags(cachedFeatureFlags);
+            cache.load(cachedFeatureFlags);
+        });
     }
 
     @Override

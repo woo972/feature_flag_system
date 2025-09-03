@@ -5,8 +5,9 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
+import java.util.stream.*;
 
 @Getter
 @Slf4j
@@ -20,11 +21,11 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
             .build();
 
     @Override
-    public void initialize(List<FeatureFlag> featureFlags) {
+    public void initialize(Optional<List<FeatureFlag>> featureFlags) {
         LOCAL_CACHE.invalidateAll();
         load(featureFlags);
         initialized = true;
-        log.info("Feature flag local cache initialized. feature flag size: {}", featureFlags.size());
+        log.info("Feature flag local cache initialized. feature flag size: {}", featureFlags.map(List::size).orElse(0));
     }
 
     /**
@@ -40,16 +41,13 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
      * 서버에서 피처 플래그 데이터를 로드하여 캐시에 저장합니다.
      */
     @Override
-    public void load(List<FeatureFlag> featureFlags) {
-        if (featureFlags == null || featureFlags.isEmpty()) {
-            return;
-        }
-
-        log.debug("Feature flag cache loaded. feature flag size: {}", featureFlags.size());
-
-        featureFlags.forEach(featureFlag -> {
-            LOCAL_CACHE.put(featureFlag.getName(), featureFlag);
-        });
+    public void load(Optional<List<FeatureFlag>> featureFlags) {
+        featureFlags.ifPresent(flags ->
+                flags.forEach(flag -> {
+                    LOCAL_CACHE.put(flag.getName(), flag);
+                })
+        );
+        log.debug("Feature flag cache loaded. feature flag size: {}", featureFlags.map(List::size).orElse(0));
     }
 
     @Override
@@ -60,6 +58,18 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
         }
 
         return Optional.ofNullable(featureFlag);
+    }
+
+    @Override
+    public Optional<List<FeatureFlag>> getFeatureFlags() {
+        Map<String, FeatureFlag> featureFlags = LOCAL_CACHE.getAllPresent();
+        if (featureFlags == null) {
+            log.error("Feature flags local cache is empty");
+            return Optional.empty();
+        }
+        // convert to list
+        List<FeatureFlag> featureFlagList = new ArrayList<>(featureFlags.values());
+        return Optional.of(featureFlagList);
     }
 }
 

@@ -5,7 +5,9 @@ import com.featureflag.shared.model.FeatureFlag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.util.List;
+
+import java.util.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultFeatureFlagLocalCacheTest {
@@ -23,7 +25,7 @@ class DefaultFeatureFlagLocalCacheTest {
     void getFeatureFlagFromCache() {
         String featureFlagName = "feature-1";
 
-        sut.load(List.of(FeatureFlag.builder().name(featureFlagName).build()));
+        sut.load(Optional.of(List.of(FeatureFlag.builder().name(featureFlagName).build())));
 
         assertTrue(sut.isInitialized());
         assertEquals(featureFlagName, sut.get(featureFlagName).get().getName());
@@ -40,7 +42,7 @@ class DefaultFeatureFlagLocalCacheTest {
     void invalidateCache() {
         String featureFlagName = "feature-1";
 
-        sut.load(List.of(FeatureFlag.builder().name(featureFlagName).build()));
+        sut.load(Optional.of(List.of(FeatureFlag.builder().name(featureFlagName).build())));
 
         sut.invalidate();
         assertFalse(sut.isInitialized());
