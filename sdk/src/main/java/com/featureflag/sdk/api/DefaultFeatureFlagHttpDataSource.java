@@ -30,7 +30,6 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
     public Optional<List<FeatureFlag>> getFeatureFlags(Optional<List<FeatureFlag>> featureFlags) {
         Map<String, List<String>> headers = new HashMap<>();
         headers.put("Content-Type", Collections.singletonList("application/json"));
-        // make Etag from featureFlags
         headers.put("ETag", Collections.singletonList(generateEtag(featureFlags)));
 
         return featureFlagCoreHttpClient.get(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH, headers);
