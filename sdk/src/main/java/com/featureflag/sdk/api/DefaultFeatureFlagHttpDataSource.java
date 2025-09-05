@@ -27,16 +27,16 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
     }
 
     @Override
-    public Optional<List<FeatureFlag>> getFeatureFlags(Optional<List<FeatureFlag>> featureFlags) {
+    public Optional<List<FeatureFlag>> getFeatureFlags(Optional<List<FeatureFlag>> oldFeatureFlags) {
         Map<String, List<String>> headers = new HashMap<>();
         headers.put("Content-Type", Collections.singletonList("application/json"));
-        headers.put("ETag", Collections.singletonList(generateEtag(featureFlags)));
+        headers.put("ETag", Collections.singletonList(generateEtag(oldFeatureFlags)));
 
         return featureFlagCoreHttpClient.get(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH, headers);
     }
 
-    private String generateEtag(Optional<List<FeatureFlag>> featureFlags) {
-        return featureFlags
+    private String generateEtag(Optional<List<FeatureFlag>> oldFeatureFlags) {
+        return oldFeatureFlags
                 .map(flags -> flags.stream()
                         .sorted(Comparator.comparing(FeatureFlag::getName))
                         .map(FeatureFlag::getName)
