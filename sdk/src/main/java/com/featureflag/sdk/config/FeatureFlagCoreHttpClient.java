@@ -20,7 +20,7 @@ public class FeatureFlagCoreHttpClient {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
-    public <T> T get(String url, Map<String, List<String>> headers) {
+    public HttpResponse<String> get(String url, Map<String, List<String>> headers) {
         int retryCount = 0;
         while (retryCount < MAX_RETRIES) {
             try {
@@ -31,14 +31,7 @@ public class FeatureFlagCoreHttpClient {
                         headers
                 ).build();
 
-                var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() >= 200 && response.statusCode() < 400) {
-                    if (response.statusCode() == 304) {
-                        log.debug("data not modified");
-                        return null;
-                    }
-                    return JsonConfig.getObjectMapper().readValue(response.body(), new TypeReference<>() {});
-                }
+                return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             } catch (Exception e) {
                 log.warn("Http request failed. {} times. url: {}", retryCount + 1, url, e);
                 retryCount++;

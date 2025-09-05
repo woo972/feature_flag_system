@@ -15,7 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
+
+import java.time.*;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -110,5 +111,13 @@ public class FeatureFlagService {
         var featureFlag = entity.toDomainModel();
         publisher.publishEvent(new FeatureFlagUpdatedEvent(featureFlag));
         return featureFlag;
+    }
+
+    @Transactional(readOnly = true)
+    public long getLastModifiedEpochTime() {
+        return repository.findTopByOrderByUpdatedAtDesc()
+                .map(FeatureFlagEntity::getUpdatedAt)
+                .map(localDateTime -> localDateTime.toEpochSecond(ZoneOffset.UTC))
+                .orElse(0L);
     }
 }

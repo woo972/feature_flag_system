@@ -3,7 +3,6 @@ package com.featureflag.sdk.api;
 import com.featureflag.sdk.config.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
-
 import java.util.*;
 
 @Slf4j
@@ -37,9 +36,8 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
         var featureFlags = source.getFeatureFlags();
         cache.initialize(featureFlags);
         scheduler.initialize(() -> {
-            var cachedFeatureFlags = cache.getFeatureFlags();
-            cachedFeatureFlags = source.getFeatureFlags(cachedFeatureFlags);
-            cache.load(cachedFeatureFlags);
+            var updatedFeatureFlags = source.getFeatureFlags();
+            cache.load(updatedFeatureFlags);
         });
     }
 

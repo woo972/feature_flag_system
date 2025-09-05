@@ -4,13 +4,12 @@ import com.featureflag.sdk.config.*;
 import com.featureflag.shared.model.*;
 import lombok.extern.slf4j.*;
 import org.apache.commons.lang3.*;
-
 import java.util.*;
-import java.util.stream.*;
 
 @Slf4j
 public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
     private final FeatureFlagCoreHttpClient featureFlagCoreHttpClient;
+    private String lastEtag;
 
     public DefaultFeatureFlagHttpDataSource(FeatureFlagCoreHttpClient featureFlagCoreHttpClient) {
         this.featureFlagCoreHttpClient = featureFlagCoreHttpClient;
@@ -23,25 +22,29 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
 
     @Override
     public Optional<List<FeatureFlag>> getFeatureFlags() {
-        return getFeatureFlags(Optional.empty());
-    }
-
-    @Override
-    public Optional<List<FeatureFlag>> getFeatureFlags(Optional<List<FeatureFlag>> oldFeatureFlags) {
         Map<String, List<String>> headers = new HashMap<>();
         headers.put("Content-Type", Collections.singletonList("application/json"));
-        headers.put("ETag", Collections.singletonList(generateEtag(oldFeatureFlags)));
 
-        return featureFlagCoreHttpClient.get(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH, headers);
+        if (StringUtils.isNotEmpty(lastEtag)) {
+            log.debug("send if-none-match header: {}", lastEtag);
+            headers.put("If-None-Match", Collections.singletonList("\"" + lastEtag + "\""));
+        }
+
+        var response = featureFlagCoreHttpClient.get(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH, headers);
+        if (response.statusCode() < 200 && response.statusCode() >= 400) {
+            log.error("Failed to get feature flags. Status code: {}", response.statusCode());
+            return Optional.empty();
+        }
+
+        if (response.statusCode() == 304) {
+            log.debug("data not modified");
+            return Optional.empty();
+        }
+
+        lastEtag = response.headers().firstValue("ETag").orElse(null);
+
+        return JsonConfig
+                .readValue(Optional.ofNullable(response.body()).orElse(StringUtils.EMPTY));
     }
 
-    private String generateEtag(Optional<List<FeatureFlag>> oldFeatureFlags) {
-        return oldFeatureFlags
-                .map(flags -> flags.stream()
-                        .sorted(Comparator.comparing(FeatureFlag::getName))
-                        .map(FeatureFlag::getName)
-                        .collect(Collectors.joining("|")))
-                .map(content -> Integer.toHexString(content.hashCode()))
-                .orElse(StringUtils.EMPTY);
-    }
 }

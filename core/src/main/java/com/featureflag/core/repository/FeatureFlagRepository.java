@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface FeatureFlagRepository extends JpaRepository<FeatureFlagEntity, Long> {
     Optional<FeatureFlagEntity> findById(Long id);
+    Optional<FeatureFlagEntity> findTopByOrderByUpdatedAtDesc();
 }
