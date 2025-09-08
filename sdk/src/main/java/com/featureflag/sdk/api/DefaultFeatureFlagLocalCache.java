@@ -11,29 +11,10 @@ import java.util.*;
 @Slf4j
 public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
 
-    private boolean initialized = false;
-
     private static final Cache<String, FeatureFlag> LOCAL_CACHE = Caffeine.newBuilder()
             .maximumSize(1000)
             .recordStats()
             .build();
-
-    @Override
-    public void initialize(Optional<List<FeatureFlag>> featureFlags) {
-        LOCAL_CACHE.invalidateAll();
-        load(featureFlags);
-        initialized = true;
-        log.info("Feature flag local cache initialized. feature flag size: {}", featureFlags.map(List::size).orElse(0));
-    }
-
-    /**
-     * 모든 캐시 데이터를 무효화합니다.
-     */
-    @Override
-    public void invalidate() {
-        LOCAL_CACHE.invalidateAll();
-        initialized = false;
-    }
 
     /**
      * 서버에서 피처 플래그 데이터를 로드하여 캐시에 저장합니다.
@@ -45,6 +26,7 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
                     LOCAL_CACHE.put(flag.getName(), flag);
                 })
         );
+
         log.debug("Feature flag cache loaded. feature flag size: {}", featureFlags.map(List::size).orElse(0));
     }
 
