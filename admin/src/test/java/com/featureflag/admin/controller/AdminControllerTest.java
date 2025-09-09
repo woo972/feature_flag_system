@@ -81,24 +81,6 @@ class AdminControllerTest {
                 .andExpect(view().name("featureflags/detail"));
     }
 
-    @DisplayName("returns feature-flags page & model")
-    @Test
-    public void returnsFeatureFlagsPageModel() throws Exception {
-        var featureFlag = createFeatureFlag();
-
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
-        Page<FeatureFlag> page = new PageImpl<>(List.of(featureFlag));
-        when(adminFeatureFlagService.list(pageable)).thenReturn(page);
-
-        mockMvc.perform(get("/admin/feature-flags")
-                        .param("page", "0")
-                        .param("size", "10")
-                        .param("sort", "id")
-                        .param("direction", "desc"))
-                .andExpect(model().attribute("featureFlagPage", page))
-                .andExpect(view().name("featureflags/list"));
-    }
-
     @DisplayName("returns feature-flag-detail page & model with on")
     @Test
     public void returnsFeatureFlagModelWithOn() throws Exception {
@@ -106,7 +88,7 @@ class AdminControllerTest {
         var featureFlag = createFeatureFlag();
         when(adminFeatureFlagService.on(id)).thenReturn(featureFlag);
 
-        mockMvc.perform(put("/admin/feature-flags/" + id + "/on"))
+        mockMvc.perform(post("/admin/feature-flags/" + id + "/on"))
                 .andExpect(redirectedUrl("/admin/feature-flags/"+id));
     }
 
@@ -117,7 +99,7 @@ class AdminControllerTest {
         var featureFlag = createOffFeatureFlag();
         when(adminFeatureFlagService.off(id)).thenReturn(featureFlag);
 
-        mockMvc.perform(put("/admin/feature-flags/" + id + "/off"))
+        mockMvc.perform(post("/admin/feature-flags/" + id + "/off"))
                 .andExpect(redirectedUrl("/admin/feature-flags/"+id));
     }
 
@@ -128,7 +110,7 @@ class AdminControllerTest {
         var featureFlag = createFeatureFlag();
         when(adminFeatureFlagService.archive(id)).thenReturn(featureFlag);
 
-        mockMvc.perform(put("/admin/feature-flags/" + id + "/archive"))
+        mockMvc.perform(post("/admin/feature-flags/" + id + "/archive"))
                 .andExpect(redirectedUrl("/admin/feature-flags/"+id));
     }
 

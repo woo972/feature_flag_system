@@ -13,5 +13,7 @@ include(
     "admin",
     "sdk",
     "shared",
-    "sample"
+    "frontend",
+    "sample",
 )
+
