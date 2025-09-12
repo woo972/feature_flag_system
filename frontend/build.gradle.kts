@@ -1,5 +1,6 @@
 plugins {
-    id("com.github.node-gradle.node") version "7.0.1"
+    id("com.github.node-gradle.node") version "7.0.2" // Gradle이 Node.js와 연동할 수 있는 플러그인
+
 }
 
 // Node.js 설정
