@@ -40,6 +40,20 @@ Common utilities and models shared across modules.
 2. Build the project: `./gradlew build`
 3. Run tests: `./gradlew test`
 
+## To do
+1. Local cache for core module in local profile
+2. Real DB and Redis connection for core module
+3. Replace frontend with React
+4. Add Integration tests
+5. Add Unit tests
+5. Add Jacoco to check code coverage
+6. Add SonarQube to check code quality
+7. Add GitHub Actions for CI/CD
+9. Add Linting
+8. Add Docker for containerization
+9. Shared module refactoring (Util, Exception, Constants)
+10. Shared model refactoring (FeatureFlag, TargetingRule, RegionRule)
+
 ## License
 
 MIT License
