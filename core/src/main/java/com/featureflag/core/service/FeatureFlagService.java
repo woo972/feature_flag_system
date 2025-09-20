@@ -15,9 +15,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.*;
 import java.util.*;
+
+import static com.featureflag.core.CacheConstants.CACHE_PREFIX;
 
 @RequiredArgsConstructor
 @Service
@@ -59,6 +60,7 @@ public class FeatureFlagService {
                 .map(FeatureFlagEntity::toDomainModel);
     }
 
+    @Cacheable(value = CACHE_PREFIX, key = "'all'", unless = "#result.isEmpty()")
     @Transactional(readOnly = true)
     public List<FeatureFlag> findAll() {
         return repository.findAll()

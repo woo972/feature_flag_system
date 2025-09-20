@@ -7,6 +7,7 @@ import lombok.extern.slf4j.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.*;
@@ -37,6 +38,11 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        if ("local".equals(active)) {
+            log.info("Using ConcurrentMapCacheManager for local profile");
+            return new ConcurrentMapCacheManager();
+        }
+
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration
                 .defaultCacheConfig()
                 .entryTtl(Duration.ofSeconds(CacheConstant.DEFAULT_CACHE_TTL))
