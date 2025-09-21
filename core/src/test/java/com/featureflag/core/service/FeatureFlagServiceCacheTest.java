@@ -12,11 +12,6 @@ import org.springframework.cache.*;
 import org.springframework.context.*;
 import org.springframework.context.annotation.*;
 import java.time.*;
-import java.util.*;
-
-import static com.featureflag.core.CacheConstants.CACHE_PREFIX;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = {FeatureFlagService.class})
 @Import(TestCacheConfig.class)
@@ -37,22 +32,16 @@ class FeatureFlagServiceCacheTest {
         cacheManager.getCacheNames().forEach(name -> cacheManager.getCache(name).clear());
     }
 
-    @DisplayName("cacheable feature flag list")
-    @Test
-    public void testFindAllCache() {
-        // Given
-        FeatureFlagEntity testEntity = createTestFeatureFlagEntity();
-        when(flagRepository.findAll()).thenReturn(List.of(testEntity));
-
-        // When
-        List<FeatureFlag> result1 = sut.findAll();
-        List<FeatureFlag> result2 = sut.findAll();
-
-        // Then
-        verify(flagRepository, times(1)).findAll();
-        assertNotNull(cacheManager.getCache(CACHE_PREFIX).get("all"));
-        assertNotNull(result1.equals(result2));
+    @Nested
+    @DisplayName("cache hit scenario of feature flag")
+    class CacheHit {
     }
+
+    @Nested
+    @DisplayName("cache evict scenario of feature flag")
+    class CacheEvict {
+    }
+
 
     private static FeatureFlagEntity createTestFeatureFlagEntity() {
         return new FeatureFlagEntity(

@@ -45,6 +45,7 @@ public class FeatureFlagService {
     @CacheEvict(value = "featureFlags", allEntries = true)
     public void refreshCache() {
         // Cache is cleared via annotation
+
     }
 
     @Transactional(readOnly = true)
@@ -60,7 +61,6 @@ public class FeatureFlagService {
                 .map(FeatureFlagEntity::toDomainModel);
     }
 
-    @Cacheable(value = CACHE_PREFIX, key = "'all'", unless = "#result.isEmpty()")
     @Transactional(readOnly = true)
     public List<FeatureFlag> findAll() {
         return repository.findAll()
