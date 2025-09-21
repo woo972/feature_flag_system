@@ -12,6 +12,9 @@ import org.springframework.cache.*;
 import org.springframework.context.*;
 import org.springframework.context.annotation.*;
 import java.time.*;
+import java.util.*;
+
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {FeatureFlagQueryService.class})
 @Import(TestCacheConfig.class)
@@ -35,6 +38,13 @@ class FeatureFlagQueryServiceCacheTest {
     @Nested
     @DisplayName("cache hit scenario of feature flag")
     class CacheHit {
+        @Test
+        @DisplayName("returns cached feature flag when cache hit")
+        public void returnsCachedFeatureFlagWhenCacheHit() {
+            var testFeatureFlagEntity = createTestFeatureFlagEntity();
+            when(flagRepository.findById(testFeatureFlagEntity.getId())).thenReturn(Optional.of(testFeatureFlagEntity));
+            FeatureFlag result = sut.get(testFeatureFlagEntity.getId());
+        }
     }
 
     @Nested

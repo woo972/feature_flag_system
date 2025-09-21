@@ -1,7 +1,6 @@
 package com.featureflag.admin.service;
 
-import com.featureflag.core.service.FeatureFlagQueryService;
-import com.featureflag.core.service.RegisterFeatureFlagRequest;
+import com.featureflag.core.service.*;
 import com.featureflag.shared.model.FeatureFlag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdminFeatureFlagService {
     private final FeatureFlagQueryService featureFlagQueryService;
+    private final FeatureFlagCommandService featureFlagCommandService;
 
     public FeatureFlag get(Long id) {
         return featureFlagQueryService.get(id);
@@ -22,17 +22,16 @@ public class AdminFeatureFlagService {
     }
 
     public void register(RegisterFeatureFlagRequest request) {
-        featureFlagQueryService.register(request);
+        featureFlagCommandService.register(request);
     }
-
     public FeatureFlag on(Long id) {
-        return featureFlagQueryService.on(id);
+        return featureFlagCommandService.on(id);
     }
     public FeatureFlag off(Long id) {
-        return featureFlagQueryService.off(id);
+        return featureFlagCommandService.off(id);
     }
     public FeatureFlag archive(Long id) {
-        return featureFlagQueryService.archive(id);
+        return featureFlagCommandService.archive(id);
     }
 
 }

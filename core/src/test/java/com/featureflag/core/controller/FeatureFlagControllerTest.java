@@ -1,6 +1,6 @@
 package com.featureflag.core.controller;
 
-import com.featureflag.core.service.FeatureFlagQueryService;
+import com.featureflag.core.service.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +17,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FeatureFlagControllerTest {
     @MockBean
     private FeatureFlagQueryService featureFlagQueryService;
+    @MockBean
+    private FeatureFlagCommandService featureFlagCommandService;
     @Autowired
     private MockMvc mockMvc;
 
-    @DisplayName("returns 400 if flagId is null")
-    @Test
-    public void testEvaluate() throws Exception {
-        mockMvc.perform(get("/api/v1/feature-flags/evaluate/"+null))
-                .andExpect(status().isBadRequest());
-    }
-
     @DisplayName("returns 200 if flagId is valid")
     @Test
-    public void testEvaluate2() throws Exception {
+    public void evaluate() throws Exception {
         long flagId = 1L;
         Map<String, String> criteria = null;
         when(featureFlagQueryService.evaluate(flagId, criteria)).thenReturn(true);
@@ -39,6 +34,10 @@ class FeatureFlagControllerTest {
                 .andExpect(jsonPath("$").value(true));
     }
 
-
-
+    @DisplayName("returns 400 if flagId is null")
+    @Test
+    public void invalidFlagId() throws Exception {
+        mockMvc.perform(get("/api/v1/feature-flags/evaluate/"+null))
+                .andExpect(status().isBadRequest());
+    }
 }

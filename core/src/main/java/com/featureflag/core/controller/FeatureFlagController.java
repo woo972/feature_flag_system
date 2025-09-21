@@ -1,7 +1,7 @@
 package com.featureflag.core.controller;
 
 import com.featureflag.core.event.FeatureFlagUpdatedEvent;
-import com.featureflag.core.service.FeatureFlagQueryService;
+import com.featureflag.core.service.*;
 import com.featureflag.shared.config.JacksonConfig;
 import com.featureflag.shared.model.*;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +24,7 @@ public class FeatureFlagController {
     private static final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     private final FeatureFlagQueryService featureFlagQueryService;
+    private final FeatureFlagCommandService featureFlagCommandService;
 
     @GetMapping
     public ResponseEntity<List<FeatureFlag>> list(WebRequest request) {
@@ -44,7 +45,7 @@ public class FeatureFlagController {
 
     @GetMapping("/cache/refresh")
     public ResponseEntity<Void> refreshCache() {
-        featureFlagQueryService.refreshCache();
+        featureFlagCommandService.refreshCache();
         return ResponseEntity.ok().build();
     }
 
