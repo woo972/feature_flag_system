@@ -1,6 +1,6 @@
 package com.featureflag.core.controller;
 
-import com.featureflag.core.service.FeatureFlagService;
+import com.featureflag.core.service.FeatureFlagQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(FeatureFlagController.class)
 class FeatureFlagControllerTest {
     @MockBean
-    private FeatureFlagService featureFlagService;
+    private FeatureFlagQueryService featureFlagQueryService;
     @Autowired
     private MockMvc mockMvc;
 
@@ -32,7 +32,7 @@ class FeatureFlagControllerTest {
     public void testEvaluate2() throws Exception {
         long flagId = 1L;
         Map<String, String> criteria = null;
-        when(featureFlagService.evaluate(flagId, criteria)).thenReturn(true);
+        when(featureFlagQueryService.evaluate(flagId, criteria)).thenReturn(true);
 
         mockMvc.perform(get("/api/v1/feature-flags/evaluate/" + flagId))
                 .andExpect(status().isOk())

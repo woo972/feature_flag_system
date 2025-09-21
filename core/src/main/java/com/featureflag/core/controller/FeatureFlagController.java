@@ -1,7 +1,7 @@
 package com.featureflag.core.controller;
 
 import com.featureflag.core.event.FeatureFlagUpdatedEvent;
-import com.featureflag.core.service.FeatureFlagService;
+import com.featureflag.core.service.FeatureFlagQueryService;
 import com.featureflag.shared.config.JacksonConfig;
 import com.featureflag.shared.model.*;
 import lombok.RequiredArgsConstructor;
@@ -23,28 +23,28 @@ public class FeatureFlagController {
     // TODO: Replace with Redis
     private static final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
-    private final FeatureFlagService featureFlagService;
+    private final FeatureFlagQueryService featureFlagQueryService;
 
     @GetMapping
     public ResponseEntity<List<FeatureFlag>> list(WebRequest request) {
-        var lastModifiedEpoch = featureFlagService.getLastModifiedEpochTime();
+        var lastModifiedEpoch = featureFlagQueryService.getLastModifiedEpochTime();
         var eTag = "\"" + lastModifiedEpoch + "\"";
         if(request.checkNotModified(eTag)) {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).eTag(eTag).build();
         }
-        return ResponseEntity.ok(featureFlagService.findAll());
+        return ResponseEntity.ok(featureFlagQueryService.findAll());
     }
 
     @GetMapping("/evaluate/{flag-id}")
     public ResponseEntity<Boolean> evaluate(
             @PathVariable(value = "flag-id", required = true) Long flagId,
             @RequestParam(value = "criteria", required = false) Map<String, String> criteria) {
-        return ResponseEntity.ok(featureFlagService.evaluate(flagId, criteria));
+        return ResponseEntity.ok(featureFlagQueryService.evaluate(flagId, criteria));
     }
 
     @GetMapping("/cache/refresh")
     public ResponseEntity<Void> refreshCache() {
-        featureFlagService.refreshCache();
+        featureFlagQueryService.refreshCache();
         return ResponseEntity.ok().build();
     }
 

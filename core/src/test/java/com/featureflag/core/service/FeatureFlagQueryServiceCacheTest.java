@@ -13,11 +13,11 @@ import org.springframework.context.*;
 import org.springframework.context.annotation.*;
 import java.time.*;
 
-@SpringBootTest(classes = {FeatureFlagService.class})
+@SpringBootTest(classes = {FeatureFlagQueryService.class})
 @Import(TestCacheConfig.class)
-class FeatureFlagServiceCacheTest {
+class FeatureFlagQueryServiceCacheTest {
     @Autowired
-    FeatureFlagService sut;
+    FeatureFlagQueryService sut;
     @Autowired
     CacheManager cacheManager;
 

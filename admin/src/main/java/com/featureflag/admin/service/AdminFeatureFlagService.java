@@ -1,6 +1,6 @@
 package com.featureflag.admin.service;
 
-import com.featureflag.core.service.FeatureFlagService;
+import com.featureflag.core.service.FeatureFlagQueryService;
 import com.featureflag.core.service.RegisterFeatureFlagRequest;
 import com.featureflag.shared.model.FeatureFlag;
 import lombok.RequiredArgsConstructor;
@@ -11,28 +11,28 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class AdminFeatureFlagService {
-    private final FeatureFlagService featureFlagService;
+    private final FeatureFlagQueryService featureFlagQueryService;
 
     public FeatureFlag get(Long id) {
-        return featureFlagService.get(id);
+        return featureFlagQueryService.get(id);
     }
 
     public Page<FeatureFlag> list(Pageable pageable) {
-        return featureFlagService.list(pageable);
+        return featureFlagQueryService.list(pageable);
     }
 
     public void register(RegisterFeatureFlagRequest request) {
-        featureFlagService.register(request);
+        featureFlagQueryService.register(request);
     }
 
     public FeatureFlag on(Long id) {
-        return featureFlagService.on(id);
+        return featureFlagQueryService.on(id);
     }
     public FeatureFlag off(Long id) {
-        return featureFlagService.off(id);
+        return featureFlagQueryService.off(id);
     }
     public FeatureFlag archive(Long id) {
-        return featureFlagService.archive(id);
+        return featureFlagQueryService.archive(id);
     }
 
 }
