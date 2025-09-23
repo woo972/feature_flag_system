@@ -24,6 +24,8 @@ public class FeatureFlagCommandService {
         entity.setName(request.getName());
         entity.setDescription(request.getDescription());
         repository.save(entity);
+
+
     }
 
     @CacheEvict(value = "featureFlags", allEntries = true)
