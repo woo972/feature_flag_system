@@ -33,10 +33,30 @@ public class FeatureFlag {
         this.archivedAt = archivedAt;
     }
 
+    public String getKey() {
+        return name;
+    }
+
     public boolean evaluate(Map<String, String> criteria) {
         if (status.equals(FeatureFlagStatus.OFF)) return false;
         if (archivedAt != null) return false;
         if (targetingRules == null) return true;
         return targetingRules.stream().allMatch(rule -> rule.matches(criteria));
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "FeatureFlag{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                ", targetingRules=" + targetingRules +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", archivedAt=" + archivedAt +
+                '}';
     }
 }

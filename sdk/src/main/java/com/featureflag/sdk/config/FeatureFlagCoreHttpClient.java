@@ -1,8 +1,8 @@
 package com.featureflag.sdk.config;
 
-import com.fasterxml.jackson.core.type.*;
 import lombok.extern.slf4j.*;
 
+import java.io.*;
 import java.net.URI;
 import java.net.http.*;
 import java.time.Duration;
@@ -20,7 +20,22 @@ public class FeatureFlagCoreHttpClient {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
+    public HttpResponse<InputStream> connectStream(String url, Map<String, List<String>> headers) {
+        if (headers == null) {
+            headers = new HashMap<>();
+        }
+        headers.put("Accept", List.of("text/event-stream"));
+        headers.put("Cache-Control", List.of("no-cache"));
+        headers.put("Connection", List.of("keep-alive"));
+
+        return this.get(url, headers, HttpResponse.BodyHandlers.ofInputStream());
+    }
+
     public HttpResponse<String> get(String url, Map<String, List<String>> headers) {
+        return get(url, headers, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private <T> HttpResponse<T> get(String url, Map<String, List<String>> headers, HttpResponse.BodyHandler<T> bodyHandler) {
         int retryCount = 0;
         while (retryCount < MAX_RETRIES) {
             try {
@@ -31,7 +46,7 @@ public class FeatureFlagCoreHttpClient {
                         headers
                 ).build();
 
-                return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                return httpClient.send(request, bodyHandler);
             } catch (Exception e) {
                 log.warn("Http request failed. {} times. url: {}", retryCount + 1, url, e);
                 retryCount++;

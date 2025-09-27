@@ -23,7 +23,7 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
     public void load(Optional<List<FeatureFlag>> featureFlags) {
         featureFlags.ifPresent(flags ->
                 flags.forEach(flag -> {
-                    LOCAL_CACHE.put(flag.getName(), flag);
+                    LOCAL_CACHE.put(flag.getKey(), flag);
                 })
         );
 
@@ -41,8 +41,8 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
     }
 
     @Override
-    public Optional<List<FeatureFlag>> getFeatureFlags() {
-        Map<String, FeatureFlag> featureFlags = LOCAL_CACHE.getAllPresent();
+    public Optional<List<FeatureFlag>> readAll() {
+        Map<String, FeatureFlag> featureFlags = LOCAL_CACHE.asMap();
         if (featureFlags == null) {
             log.error("Feature flags local cache is empty");
             return Optional.empty();
@@ -50,6 +50,11 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
         // convert to list
         List<FeatureFlag> featureFlagList = new ArrayList<>(featureFlags.values());
         return Optional.of(featureFlagList);
+    }
+
+    @Override
+    public void put(String key, Optional<FeatureFlag> value) {
+        value.ifPresent(v -> LOCAL_CACHE.put(key, v));
     }
 }
 

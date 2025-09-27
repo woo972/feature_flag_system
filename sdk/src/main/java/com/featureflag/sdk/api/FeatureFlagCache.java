@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface FeatureFlagCache {
     void load(Optional<List<FeatureFlag>> featureFlags);
     Optional<FeatureFlag> get(String featureFlagName);
-    Optional<List<FeatureFlag>> getFeatureFlags();
+    Optional<List<FeatureFlag>> readAll();
+    void put(String featureFlagName, Optional<FeatureFlag> featureFlag);
 }

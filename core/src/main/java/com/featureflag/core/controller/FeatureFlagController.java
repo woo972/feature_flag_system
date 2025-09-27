@@ -24,7 +24,7 @@ public class FeatureFlagController {
     public ResponseEntity<List<FeatureFlag>> list(WebRequest request) {
         var lastModifiedEpoch = featureFlagQueryService.getLastModifiedEpochTime();
         var eTag = "\"" + lastModifiedEpoch + "\"";
-        if(request.checkNotModified(eTag)) {
+        if (request.checkNotModified(eTag)) {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).eTag(eTag).build();
         }
         return ResponseEntity.ok(featureFlagQueryService.findAll());
@@ -43,8 +43,13 @@ public class FeatureFlagController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(path = "/connect-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter sse(@PathVariable(value = "client-id", required = true) String clientId) {
-        return featureFlagStreamProvider.initiateConnection(clientId);
+    @GetMapping(path = "/event-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<SseEmitter> sse() {
+        String clientId = UUID.randomUUID().toString();
+        SseEmitter emitter = featureFlagStreamProvider.initiateConnection(clientId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Client-Id", clientId);
+        return new ResponseEntity<>(emitter, headers, HttpStatus.OK);
     }
 }
