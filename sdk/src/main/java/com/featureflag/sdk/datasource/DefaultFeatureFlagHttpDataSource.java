@@ -1,4 +1,4 @@
-package com.featureflag.sdk.api;
+package com.featureflag.sdk.datasource;
 
 import com.featureflag.sdk.config.*;
 import com.featureflag.shared.model.*;

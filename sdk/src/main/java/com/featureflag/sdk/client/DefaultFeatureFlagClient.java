@@ -1,6 +1,10 @@
-package com.featureflag.sdk.api;
+package com.featureflag.sdk.client;
 
+import com.featureflag.sdk.cache.*;
 import com.featureflag.sdk.config.*;
+import com.featureflag.sdk.datasource.*;
+import com.featureflag.sdk.scheduler.*;
+import com.featureflag.sdk.stream.*;
 import com.featureflag.shared.model.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
@@ -73,5 +77,13 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
     @Override
     public Optional<List<FeatureFlag>> readAllFeatureFlags() {
         return cache.readAll();
+    }
+
+    public void log(){
+        log.info("Feature flag client initialized. " +
+                        "data source: {}, cache: {}, update mode: {}",
+                source.getClass().getSimpleName(),
+                cache.getClass().getSimpleName(),
+                updateMode);
     }
 }

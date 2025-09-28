@@ -1,4 +1,4 @@
-package com.featureflag.sdk.api;
+package com.featureflag.sdk.scheduler;
 
 public interface FeatureFlagChangeScheduler extends AutoCloseable {
     void initialize(Runnable runnable);

@@ -1,4 +1,4 @@
-package com.featureflag.sdk.api;
+package com.featureflag.sdk.event;
 
 import java.util.*;
 

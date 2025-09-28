@@ -1,6 +1,6 @@
 package com.featureflag.sample;
 
-import com.featureflag.sdk.api.*;
+import com.featureflag.sdk.client.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.web.bind.annotation.*;

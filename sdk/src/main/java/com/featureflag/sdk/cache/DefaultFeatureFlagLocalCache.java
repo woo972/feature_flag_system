@@ -1,4 +1,4 @@
-package com.featureflag.sdk.api;
+package com.featureflag.sdk.cache;
 
 import com.featureflag.shared.model.FeatureFlag;
 import com.github.benmanes.caffeine.cache.Cache;

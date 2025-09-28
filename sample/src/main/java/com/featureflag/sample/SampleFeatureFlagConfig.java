@@ -1,6 +1,6 @@
 package com.featureflag.sample;
 
-import com.featureflag.sdk.api.*;
+import com.featureflag.sdk.client.*;
 import org.springframework.context.annotation.*;
 
 @Configuration
@@ -8,7 +8,10 @@ public class SampleFeatureFlagConfig {
 
     @Bean
     public FeatureFlagClient featureFlagClient() {
-        return DefaultFeatureFlagClient.builder().build();
+        return DefaultFeatureFlagClient
+                .builder()
+                .updateMode(UpdateMode.STREAM)
+                .build();
     }
 
     @Bean

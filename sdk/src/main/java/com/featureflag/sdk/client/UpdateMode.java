@@ -1,4 +1,4 @@
-package com.featureflag.sdk.config;
+package com.featureflag.sdk.client;
 
 public enum UpdateMode {
     STREAM,
