@@ -1,17 +1,7 @@
 package com.featureflag.sdk.client;
 
-import com.featureflag.sdk.cache.*;
-import com.featureflag.sdk.datasource.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class DefaultFeatureFlagClientTest {
     DefaultFeatureFlagClient sut;
