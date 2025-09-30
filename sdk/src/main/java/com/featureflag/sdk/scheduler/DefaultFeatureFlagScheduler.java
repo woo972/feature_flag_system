@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
-public class DefaultFeatureFlagScheduler implements FeatureFlagChangeScheduler {
+public class DefaultFeatureFlagScheduler implements FeatureFlagScheduler {
     private static final long INITIAL_DELAY_SECONDS = 0;
     private static final long POLLING_INTERVAL_SECONDS = 10;
 

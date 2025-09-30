@@ -15,8 +15,8 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
     private final FeatureFlagDataSource source;
     private final FeatureFlagCache cache;
     private final UpdateMode updateMode;
-    private FeatureFlagChangeScheduler scheduler;
-    private FeatureFlagChangeStreamListener listener;
+    private FeatureFlagScheduler scheduler;
+    private FeatureFlagStreamListener listener;
 
     @Builder
     public DefaultFeatureFlagClient(FeatureFlagDataSource source, FeatureFlagCache cache, UpdateMode updateMode) {
@@ -26,14 +26,17 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
         if (cache == null) {
             cache = new DefaultFeatureFlagLocalCache();
         }
+        if(updateMode == null) {
+            updateMode = UpdateMode.STREAM;
+        }
 
         this.source = source;
         this.cache = cache;
         this.updateMode = updateMode;
 
-        if(updateMode == null || UpdateMode.POLLING.equals(updateMode)) {
+        if(UpdateMode.POLLING.equals(updateMode)) {
             this.scheduler = new DefaultFeatureFlagScheduler();
-        }else if (UpdateMode.POLLING.equals(updateMode)) {
+        }else if (UpdateMode.STREAM.equals(updateMode)) {
             this.listener = new DefaultFeatureFlagStreamListener();
         }
 
@@ -79,11 +82,15 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
         return cache.readAll();
     }
 
-    public void log(){
-        log.info("Feature flag client initialized. " +
-                        "data source: {}, cache: {}, update mode: {}",
-                source.getClass().getSimpleName(),
-                cache.getClass().getSimpleName(),
-                updateMode);
+    public Map<String, String> activatedParameters(){
+        String schedulerClassName = scheduler == null ? "null" : scheduler.getClass().getSimpleName();
+        String listenerClassName = listener == null ? "null" : listener.getClass().getSimpleName();
+        return new HashMap<String, String>() {{
+           put("source", source.getClass().getSimpleName());
+           put("cache", cache.getClass().getSimpleName());
+           put("updateMode", updateMode.name());
+           put("scheduler", schedulerClassName);
+           put("listener", listenerClassName);
+        }};
     }
 }

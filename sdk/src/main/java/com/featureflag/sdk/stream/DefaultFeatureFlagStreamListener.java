@@ -11,7 +11,7 @@ import java.util.function.*;
 import static com.featureflag.sdk.config.FeatureFlagProperty.FEATURE_FLAG_STREAM_PATH;
 
 @Slf4j
-public class DefaultFeatureFlagStreamListener implements FeatureFlagChangeStreamListener {
+public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListener {
 
     private String clientId;
     private final ExecutorService executorService;
