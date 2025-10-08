@@ -14,6 +14,8 @@ import org.springframework.context.annotation.*;
 import java.time.*;
 import java.util.*;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {FeatureFlagQueryService.class})
@@ -35,16 +37,14 @@ class FeatureFlagQueryServiceCacheTest {
         cacheManager.getCacheNames().forEach(name -> cacheManager.getCache(name).clear());
     }
 
-    @Nested
-    @DisplayName("cache hit scenario of feature flag")
-    class CacheHit {
         @Test
-        @DisplayName("returns cached feature flag when cache hit")
-        public void returnsCachedFeatureFlagWhenCacheHit() {
-            var testFeatureFlagEntity = createTestFeatureFlagEntity();
-            when(flagRepository.findById(testFeatureFlagEntity.getId())).thenReturn(Optional.of(testFeatureFlagEntity));
-            FeatureFlag result = sut.get(testFeatureFlagEntity.getId());
-        }
+    @DisplayName("cache hit scenario of feature flag")
+    public void returnsCachedFeatureFlagWhenCacheHit() {
+        var testFeatureFlagEntity = createTestFeatureFlagEntity();
+        when(flagRepository.findById(testFeatureFlagEntity.getId())).thenReturn(Optional.of(testFeatureFlagEntity));
+        sut.evaluate(testFeatureFlagEntity.getId(), Collections.emptyMap());
+        sut.evaluate(testFeatureFlagEntity.getId(), Collections.emptyMap());
+        verify(flagRepository, times(1)).findById(testFeatureFlagEntity.getId());
     }
 
     @Nested
