@@ -31,9 +31,9 @@ public class FeatureFlagCommandService {
     @CacheEvict(value = "featureFlags", allEntries = true)
     public void refreshCache() {
         // Cache is cleared via annotation
-
     }
 
+    @CacheEvict(value = "featureFlags", key = "#id")
     @Transactional
     public FeatureFlag on(Long id) {
         FeatureFlagEntity entity = repository.findById(id)
@@ -49,6 +49,7 @@ public class FeatureFlagCommandService {
         return featureFlag;
     }
 
+    @CacheEvict(value = "featureFlags", key = "#id")
     @Transactional
     public FeatureFlag off(Long id) {
         FeatureFlagEntity entity = repository.findById(id)
@@ -64,6 +65,7 @@ public class FeatureFlagCommandService {
         return featureFlag;
     }
 
+    @CacheEvict(value = "featureFlags", key = "#id")
     @Transactional
     public FeatureFlag archive(Long id) {
         FeatureFlagEntity entity = repository.findById(id)

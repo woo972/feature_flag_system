@@ -1,6 +1,20 @@
 package com.featureflag.sdk.client;
 
+import com.featureflag.sdk.cache.FeatureFlagCache;
+import com.featureflag.sdk.datasource.FeatureFlagDataSource;
+import com.featureflag.sdk.scheduler.FeatureFlagScheduler;
+import com.featureflag.sdk.stream.FeatureFlagStreamListener;
+import com.featureflag.shared.model.FeatureFlag;
+import com.featureflag.shared.model.FeatureFlagStatus;
 import org.junit.jupiter.api.*;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultFeatureFlagClientTest {
@@ -39,6 +53,243 @@ class DefaultFeatureFlagClientTest {
                         assertEquals("null", activatedParameters.get("listener"));
                     }
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("initialize")
+    class Initialize {
+        @Test
+        @DisplayName("polling mode schedules cache refresh runnable")
+        void initializePollingMode() throws Exception {
+            var featureFlag = sampleFlag("polling-" + UUID.randomUUID());
+            var dataSource = new RecordingDataSource(Optional.of(List.of(featureFlag)));
+            var cache = new RecordingCache();
+
+            sut = DefaultFeatureFlagClient.builder()
+                    .source(dataSource)
+                    .cache(cache)
+                    .updateMode(UpdateMode.POLLING)
+                    .build();
+
+            var scheduler = new TestScheduler();
+            injectScheduler(sut, scheduler);
+
+            sut.initialize();
+
+            assertEquals(1, scheduler.initializeCount);
+            assertNotNull(scheduler.capturedRunnable);
+
+            scheduler.runCaptured();
+            assertEquals(1, dataSource.callCount);
+            assertTrue(cache.get(featureFlag.getKey()).isPresent());
+            assertEquals(1, cache.loadCount);
+        }
+
+        @Test
+        @DisplayName("stream mode loads cache and refreshes entries on updates")
+        void initializeStreamMode() throws Exception {
+            var featureFlag = sampleFlag("stream-" + UUID.randomUUID());
+            var dataSource = new RecordingDataSource(Optional.of(List.of(featureFlag)));
+            var cache = new RecordingCache();
+
+            sut = DefaultFeatureFlagClient.builder()
+                    .source(dataSource)
+                    .cache(cache)
+                    .updateMode(UpdateMode.STREAM)
+                    .build();
+
+            var listener = new TestStreamListener();
+            injectListener(sut, listener);
+
+            sut.initialize();
+
+            assertEquals(1, dataSource.callCount);
+            assertEquals(1, cache.loadCount);
+            assertTrue(cache.get(featureFlag.getKey()).isPresent());
+            assertEquals(1, listener.initializeCount);
+
+            listener.emit(featureFlag.getKey());
+
+            assertEquals(featureFlag.getKey(), cache.lastPutKey);
+            assertTrue(cache.lastPutValue.isPresent());
+            assertSame(cache.get(featureFlag.getKey()).orElseThrow(), cache.lastPutValue.orElseThrow());
+        }
+    }
+
+    @Nested
+    @DisplayName("evaluation")
+    class Evaluation {
+        @Test
+        @DisplayName("evaluates cached flag state")
+        void isEnabledEvaluatesFlag() {
+            var cache = new RecordingCache();
+            var flag = sampleFlag("enabled-flag");
+            cache.store.put(flag.getKey(), flag);
+
+            sut = DefaultFeatureFlagClient.builder()
+                    .source(new RecordingDataSource(Optional.empty()))
+                    .cache(cache)
+                    .updateMode(UpdateMode.STREAM)
+                    .build();
+
+            var enabled = sut.isEnabled(flag.getKey(), Map.of());
+
+            assertTrue(enabled);
+        }
+
+        @Test
+        @DisplayName("returns false when flag missing")
+        void isEnabledReturnsFalseWhenMissing() {
+            var cache = new RecordingCache();
+
+            sut = DefaultFeatureFlagClient.builder()
+                    .source(new RecordingDataSource(Optional.empty()))
+                    .cache(cache)
+                    .updateMode(UpdateMode.STREAM)
+                    .build();
+
+            var enabled = sut.isEnabled("missing", Map.of());
+
+            assertFalse(enabled);
+        }
+
+        @Test
+        @DisplayName("delegates to cache")
+        void readAllDelegatesToCache() {
+            var cache = new RecordingCache();
+            var flagOne = sampleFlag("all-1");
+            var flagTwo = sampleFlag("all-2");
+            cache.store.put(flagOne.getKey(), flagOne);
+            cache.store.put(flagTwo.getKey(), flagTwo);
+
+            sut = DefaultFeatureFlagClient.builder()
+                    .source(new RecordingDataSource(Optional.empty()))
+                    .cache(cache)
+                    .updateMode(UpdateMode.STREAM)
+                    .build();
+
+            var result = sut.readAllFeatureFlags();
+
+            assertTrue(result.isPresent());
+            assertEquals(2, result.orElseGet(List::of).size());
+        }
+    }
+
+    private FeatureFlag sampleFlag(String name) {
+        return FeatureFlag.builder()
+                .id(1L)
+                .name(name)
+                .status(FeatureFlagStatus.ON)
+                .build();
+    }
+
+    private void injectScheduler(DefaultFeatureFlagClient client, FeatureFlagScheduler scheduler) throws Exception {
+        Field field = DefaultFeatureFlagClient.class.getDeclaredField("scheduler");
+        field.setAccessible(true);
+        field.set(client, scheduler);
+    }
+
+    private void injectListener(DefaultFeatureFlagClient client, FeatureFlagStreamListener listener) throws Exception {
+        Field field = DefaultFeatureFlagClient.class.getDeclaredField("listener");
+        field.setAccessible(true);
+        field.set(client, listener);
+    }
+
+    private static class RecordingDataSource implements FeatureFlagDataSource {
+        private Optional<List<FeatureFlag>> toReturn;
+        private int callCount;
+
+        RecordingDataSource(Optional<List<FeatureFlag>> toReturn) {
+            this.toReturn = toReturn;
+        }
+
+        @Override
+        public FeatureFlag get(String featureFlagName) {
+            return null;
+        }
+
+        @Override
+        public Optional<List<FeatureFlag>> getFeatureFlags() {
+            callCount++;
+            return toReturn;
+        }
+    }
+
+    private static class RecordingCache implements FeatureFlagCache {
+        private final Map<String, FeatureFlag> store = new HashMap<>();
+        private int loadCount;
+        private String lastPutKey;
+        private Optional<FeatureFlag> lastPutValue = Optional.empty();
+
+        @Override
+        public void load(Optional<List<FeatureFlag>> featureFlags) {
+            loadCount++;
+            featureFlags.ifPresent(flags -> {
+                store.clear();
+                flags.forEach(flag -> store.put(flag.getKey(), flag));
+            });
+        }
+
+        @Override
+        public Optional<FeatureFlag> get(String key) {
+            return Optional.ofNullable(store.get(key));
+        }
+
+        @Override
+        public Optional<List<FeatureFlag>> readAll() {
+            return Optional.of(new ArrayList<>(store.values()));
+        }
+
+        @Override
+        public void put(String key, Optional<FeatureFlag> value) {
+            lastPutKey = key;
+            lastPutValue = value;
+            value.ifPresent(flag -> store.put(key, flag));
+        }
+    }
+
+    private static class TestScheduler implements FeatureFlagScheduler {
+        private int initializeCount;
+        private Runnable capturedRunnable;
+
+        @Override
+        public void initialize(Runnable runnable) {
+            initializeCount++;
+            this.capturedRunnable = runnable;
+        }
+
+        @Override
+        public void close() {
+            // no-op for tests
+        }
+
+        void runCaptured() {
+            if (capturedRunnable != null) {
+                capturedRunnable.run();
+            }
+        }
+    }
+
+    private static class TestStreamListener implements FeatureFlagStreamListener {
+        private int initializeCount;
+        private Consumer<String> consumer;
+
+        @Override
+        public void initialize(Consumer<String> onFeatureFlagUpdated) {
+            initializeCount++;
+            this.consumer = onFeatureFlagUpdated;
+        }
+
+        @Override
+        public void close() {
+            // no-op for tests
+        }
+
+        void emit(String featureFlagName) {
+            if (consumer != null) {
+                consumer.accept(featureFlagName);
+            }
         }
     }
 }

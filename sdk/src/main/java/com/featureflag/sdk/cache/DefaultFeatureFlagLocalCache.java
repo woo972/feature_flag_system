@@ -56,5 +56,9 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
     public void put(String key, Optional<FeatureFlag> value) {
         value.ifPresent(v -> LOCAL_CACHE.put(key, v));
     }
+
+    public void invalidateAll(){
+        LOCAL_CACHE.invalidateAll();
+    }
 }
 
