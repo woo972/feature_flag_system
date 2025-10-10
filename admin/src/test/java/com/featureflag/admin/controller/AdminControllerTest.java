@@ -72,7 +72,7 @@ class AdminControllerTest {
     @DisplayName("returns feature-flag-detail page & model")
     @Test
     public void returnsFeatureFlagModel() throws Exception {
-        Long id = 1L;
+        long id = 1L;
         var featureFlag = createFeatureFlag();
         when(adminFeatureFlagService.get(id)).thenReturn(featureFlag);
 
@@ -84,7 +84,7 @@ class AdminControllerTest {
     @DisplayName("returns feature-flag-detail page & model with on")
     @Test
     public void returnsFeatureFlagModelWithOn() throws Exception {
-        Long id = 1L;
+        long id = 1L;
         var featureFlag = createFeatureFlag();
         when(adminFeatureFlagService.on(id)).thenReturn(featureFlag);
 
@@ -95,7 +95,7 @@ class AdminControllerTest {
     @DisplayName("returns feature-flag-detail page & model with off")
     @Test
     public void returnsFeatureFlagModelWithOff() throws Exception {
-        Long id = 1L;
+        long id = 1L;
         var featureFlag = createOffFeatureFlag();
         when(adminFeatureFlagService.off(id)).thenReturn(featureFlag);
 
@@ -106,7 +106,7 @@ class AdminControllerTest {
     @DisplayName("returns feature-flag-detail page & model with archived")
     @Test
     public void returnsFeatureFlagModelWithArchived() throws Exception {
-        Long id = 1L;
+        long id = 1L;
         var featureFlag = createFeatureFlag();
         when(adminFeatureFlagService.archive(id)).thenReturn(featureFlag);
 

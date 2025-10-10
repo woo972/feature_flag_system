@@ -60,26 +60,26 @@ public class AdminController {
     }
 
     @GetMapping("/feature-flags/{id}")
-    public String detailPage(@PathVariable(value = "id", required = true) Long id,
+    public String detailPage(@PathVariable(value = "id", required = true) long id,
                              Model model) {
         model.addAttribute("featureFlag", adminFeatureFlagService.get(id));
         return ADMIN_VIEW_BASE_PATH + "/detail";
     }
 
     @PostMapping("/feature-flags/{id}/on")
-    public String on(@PathVariable(value = "id", required = true) Long id, Model model) {
+    public String on(@PathVariable(value = "id", required = true) long id, Model model) {
         adminFeatureFlagService.on(id);
         return "redirect:/admin/feature-flags/" + id;
     }
 
     @PostMapping("/feature-flags/{id}/off")
-    public String off(@PathVariable(value = "id", required = true) Long id, Model model) {
+    public String off(@PathVariable(value = "id", required = true) long id, Model model) {
         adminFeatureFlagService.off(id);
         return "redirect:/admin/feature-flags/" + id;
     }
 
     @PostMapping("/feature-flags/{id}/archive")
-    public String archive(@PathVariable(value = "id", required = true) Long id, Model model) {
+    public String archive(@PathVariable(value = "id", required = true) long id, Model model) {
         adminFeatureFlagService.archive(id);
         return "redirect:/admin/feature-flags/" + id;
     }

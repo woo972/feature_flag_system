@@ -8,12 +8,13 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 class DefaultFeatureFlagLocalCacheTest {
-
+    private static final AtomicLong idSequence = new AtomicLong(1);
     private DefaultFeatureFlagLocalCache cache;
 
     @BeforeEach
@@ -28,7 +29,7 @@ class DefaultFeatureFlagLocalCacheTest {
         var featureFlag = sampleFlag("flag-" + UUID.randomUUID());
 
         cache.load(Optional.of(List.of(featureFlag)));
-        var cached = cache.get(featureFlag.getKey());
+        var cached = cache.get(featureFlag.getId());
 
         assertTrue(cached.isPresent());
         assertSame(featureFlag, cached.orElseThrow());
@@ -37,7 +38,7 @@ class DefaultFeatureFlagLocalCacheTest {
     @Test
     @DisplayName("returns empty optional for missing keys")
     void getReturnsEmptyWhenMissing() {
-        var missing = cache.get("missing-" + UUID.randomUUID());
+        var missing = cache.get(-999L);
         assertTrue(missing.isEmpty());
     }
 
@@ -46,11 +47,23 @@ class DefaultFeatureFlagLocalCacheTest {
     void putInsertsValue() {
         var featureFlag = sampleFlag("flag-" + UUID.randomUUID());
 
-        cache.put(featureFlag.getKey(), Optional.of(featureFlag));
-        var cached = cache.get(featureFlag.getKey());
+        cache.put(featureFlag.getId(), Optional.of(featureFlag));
+        var cached = cache.get(featureFlag.getId());
 
         assertTrue(cached.isPresent());
         assertSame(featureFlag, cached.orElseThrow());
+    }
+
+    @Test
+    @DisplayName("removes entry when optional empty provided")
+    void putRemovesValueWhenEmpty() {
+        var featureFlag = sampleFlag("flag-" + UUID.randomUUID());
+        cache.put(featureFlag.getId(), Optional.of(featureFlag));
+        assertTrue(cache.get(featureFlag.getId()).isPresent());
+
+        cache.put(featureFlag.getId(), Optional.empty());
+
+        assertTrue(cache.get(featureFlag.getId()).isEmpty());
     }
 
     @Test
@@ -72,7 +85,7 @@ class DefaultFeatureFlagLocalCacheTest {
 
     private FeatureFlag sampleFlag(String name) {
         return FeatureFlag.builder()
-                .id(1L)
+                .id(idSequence.getAndIncrement())
                 .name(name)
                 .status(FeatureFlagStatus.ON)
                 .build();

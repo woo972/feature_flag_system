@@ -125,7 +125,7 @@ class FeatureFlagServiceCacheTest {
         return createFeatureFlagEntity(3L, "test-flag-archivable", FeatureFlagStatus.ON, null);
     }
 
-    private static FeatureFlagEntity createFeatureFlagEntity(Long id, String name, FeatureFlagStatus status, LocalDateTime archivedAt) {
+    private static FeatureFlagEntity createFeatureFlagEntity(long id, String name, FeatureFlagStatus status, LocalDateTime archivedAt) {
         return new FeatureFlagEntity(
                 id,
                 name,

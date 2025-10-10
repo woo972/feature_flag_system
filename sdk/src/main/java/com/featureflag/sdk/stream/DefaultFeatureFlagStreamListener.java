@@ -6,7 +6,7 @@ import lombok.extern.slf4j.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.*;
+import java.util.function.LongConsumer;
 
 import static com.featureflag.sdk.config.FeatureFlagProperty.FEATURE_FLAG_STREAM_PATH;
 
@@ -29,7 +29,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
     }
 
     @Override
-    public void initialize(Consumer<String> onFeatureFlagUpdated) {
+    public void initialize(LongConsumer onFeatureFlagUpdated) {
         this.isRunning = true;
         CompletableFuture.runAsync(() -> {
             while (isRunning && !Thread.currentThread().isInterrupted()) {
@@ -67,7 +67,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
         return response.body();
     }
 
-    private void listen(InputStream stream, Consumer<String> onFeatureFlagUpdated) {
+    private void listen(InputStream stream, LongConsumer onFeatureFlagUpdated) {
         try(BufferedReader reader = new BufferedReader(
                 new InputStreamReader(stream))) {
             String eventType = null;
@@ -105,7 +105,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
         }
     }
 
-    private void handleSseEvent(String eventType, String data, Consumer<String> onFeatureFlagUpdated) {
+    private void handleSseEvent(String eventType, String data, LongConsumer onFeatureFlagUpdated) {
         log.debug("Handling SSE event: {} with data: {}", eventType, data);
 
         switch (eventType) {
@@ -121,7 +121,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
         }
     }
 
-    private String handleFeatureFlagUpdatedEvent(String data) {
+    private long handleFeatureFlagUpdatedEvent(String data) {
         FeatureFlag featureFlag = null;
         try {
             var objectMapper = JsonConfig.getObjectMapper();
@@ -139,10 +139,11 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
             log.error("Failed to parse FeatureFlagUpdatedEvent: {}", data, e);
         }
 
-        if (featureFlag == null) {
-            return "";
+        if(featureFlag == null) {
+            throw new RuntimeException("Failed to handle FeatureFlagUpdatedEvent: " + data);
         }
-        return featureFlag.getKey();
+
+        return featureFlag.getId();
     }
 
     @Override

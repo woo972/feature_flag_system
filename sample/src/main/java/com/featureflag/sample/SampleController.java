@@ -16,10 +16,10 @@ public class SampleController {
 
     @GetMapping("/check")
     public String hello(
-            @RequestParam("flag") String flag,
+            @RequestParam("flagId") long flagId,
             @RequestParam("key") String key,
             @RequestParam("value") String value) {
-        return String.valueOf(flagTest(flag, key, value));
+        return String.valueOf(flagTest(flagId, key, value));
     }
 
     @GetMapping("/init")
@@ -28,8 +28,8 @@ public class SampleController {
         featureFlagClient.initialize();
     }
 
-    public boolean flagTest(String flag, String key, String value) {
+    public boolean flagTest(long flagId, String key, String value) {
         log.info("flag test");
-        return featureFlagClient.isEnabled(flag, Map.of(key, value));
+        return featureFlagClient.isEnabled(flagId, Map.of(key, value));
     }
 }

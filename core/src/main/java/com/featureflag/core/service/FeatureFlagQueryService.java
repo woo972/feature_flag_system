@@ -21,7 +21,7 @@ public class FeatureFlagQueryService {
     private final ApplicationEventPublisher publisher;
 
     @Cacheable(value = "featureFlags", key = "#flagId")
-    public boolean evaluate(Long flagId, Map<String, String> criteria) {
+    public boolean evaluate(long flagId, Map<String, String> criteria) {
         return repository.findById(flagId)
                 .map(FeatureFlagEntity::toDomainModel)
                 .map(flag -> flag.evaluate(criteria))
@@ -29,7 +29,7 @@ public class FeatureFlagQueryService {
     }
 
     @Transactional(readOnly = true)
-    public FeatureFlag get(Long id) {
+    public FeatureFlag get(long id) {
         return repository.findById(id)
                 .map(FeatureFlagEntity::toDomainModel)
                 .orElseThrow(() -> new FeatureFlagNotFoundException(id));

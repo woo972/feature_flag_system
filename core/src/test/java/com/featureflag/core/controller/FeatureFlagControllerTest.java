@@ -19,6 +19,8 @@ class FeatureFlagControllerTest {
     private FeatureFlagQueryService featureFlagQueryService;
     @MockBean
     private FeatureFlagCommandService featureFlagCommandService;
+    @MockBean
+    private FeatureFlagStreamProvider featureFlagStreamProvider;
     @Autowired
     private MockMvc mockMvc;
 

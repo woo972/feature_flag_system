@@ -66,7 +66,7 @@ class FeatureFlagQueryServiceTest {
     @DisplayName("get feature flag by id")
     @Test
     public void getFeatureFlagById() {
-        Long id = 1L;
+        long id = 1L;
         FeatureFlagEntity entity = new FeatureFlagEntity(
                 id,
                 "flag",
@@ -95,7 +95,7 @@ class FeatureFlagQueryServiceTest {
     @DisplayName("returns true when flag is on and criteria matches")
     @Test
     public void returnsTrueWhenFlagIsOnAndCriteriaMatches() {
-        Long flagId = 1L;
+        long flagId = 1L;
         Map<String, String> criteria = null;
         FeatureFlagEntity flag = new FeatureFlagEntity(
                 flagId,
@@ -115,7 +115,7 @@ class FeatureFlagQueryServiceTest {
     @DisplayName("returns false when flag is not exists")
     @Test
     public void returnsFalseWhenFlagIsNotExists() {
-        Long flagId = 1L;
+        long flagId = 1L;
         Map<String, String> criteria = null;
         when(flagRepository.findById(flagId)).thenReturn(Optional.empty());
         boolean result = sut.evaluate(flagId, criteria);
@@ -125,7 +125,7 @@ class FeatureFlagQueryServiceTest {
     @DisplayName("returns false when flag is off")
     @Test
     public void returnsFalseWhenFlagIsOff() {
-        Long flagId = 1L;
+        long flagId = 1L;
         Map<String, String> criteria = null;
         FeatureFlagEntity flag = new FeatureFlagEntity(
                 flagId,

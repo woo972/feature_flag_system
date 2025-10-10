@@ -13,7 +13,7 @@ public class AdminFeatureFlagService {
     private final FeatureFlagQueryService featureFlagQueryService;
     private final FeatureFlagCommandService featureFlagCommandService;
 
-    public FeatureFlag get(Long id) {
+    public FeatureFlag get(long id) {
         return featureFlagQueryService.get(id);
     }
 
@@ -24,13 +24,13 @@ public class AdminFeatureFlagService {
     public void register(RegisterFeatureFlagRequest request) {
         featureFlagCommandService.register(request);
     }
-    public FeatureFlag on(Long id) {
+    public FeatureFlag on(long id) {
         return featureFlagCommandService.on(id);
     }
-    public FeatureFlag off(Long id) {
+    public FeatureFlag off(long id) {
         return featureFlagCommandService.off(id);
     }
-    public FeatureFlag archive(Long id) {
+    public FeatureFlag archive(long id) {
         return featureFlagCommandService.archive(id);
     }
 

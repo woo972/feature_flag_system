@@ -53,27 +53,26 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
                 var updatedFeatureFlags = source.getFeatureFlags();
                 cache.load(updatedFeatureFlags);
             });
-        }else if (UpdateMode.STREAM.equals(updateMode)) {
+        } else if (UpdateMode.STREAM.equals(updateMode)) {
             var updatedFeatureFlags = source.getFeatureFlags();
             cache.load(updatedFeatureFlags);
-            listener.initialize((changedFeatureFlagName) -> {
-                var featureFlag = cache.get(changedFeatureFlagName);
-                cache.put(changedFeatureFlagName, featureFlag);
-            });
+            listener.initialize(changedFeatureFlagId ->
+                    cache.put(changedFeatureFlagId, Optional.ofNullable(source.get(changedFeatureFlagId)))
+            );
         }
     }
 
     @Override
-    public boolean isEnabled(String featureFlagName, Map<String, String> criteria) {
-        var result = cache.get(featureFlagName)
+    public boolean isEnabled(long featureFlagId, Map<String, String> criteria) {
+        var result = cache.get(featureFlagId)
                 .map(featureFlag -> featureFlag.evaluate(criteria))
                 .orElseGet(
                         () -> {
-                            log.error("{} is not found in feature flag cache", featureFlagName);
+                            log.error("Feature flag id {} is not found in feature flag cache", featureFlagId);
                             return false;
                         }
                 );
-        log.debug("evaluated feature flag: {}, result: {}", featureFlagName, result);
+        log.debug("evaluated feature flag id: {}, result: {}", featureFlagId, result);
         return result;
     }
 

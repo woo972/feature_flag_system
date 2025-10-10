@@ -5,13 +5,14 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 
 @Getter
 @Slf4j
 public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
 
-    private static final Cache<String, FeatureFlag> LOCAL_CACHE = Caffeine.newBuilder()
+    private static final Cache<Long, FeatureFlag> LOCAL_CACHE = Caffeine.newBuilder()
             .maximumSize(1000)
             .recordStats()
             .build();
@@ -22,16 +23,14 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
     @Override
     public void load(Optional<List<FeatureFlag>> featureFlags) {
         featureFlags.ifPresent(flags ->
-                flags.forEach(flag -> {
-                    LOCAL_CACHE.put(flag.getKey(), flag);
-                })
+                flags.forEach(flag -> LOCAL_CACHE.put(flag.getId(), flag))
         );
 
         log.debug("Feature flag cache loaded. feature flag size: {}", featureFlags.map(List::size).orElse(0));
     }
 
     @Override
-    public Optional<FeatureFlag> get(String key) {
+    public Optional<FeatureFlag> get(long key) {
         var featureFlag = LOCAL_CACHE.getIfPresent(key);
         if (featureFlag == null) {
             log.error("Feature flag local cache miss. Key: {}", key);
@@ -42,7 +41,7 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
 
     @Override
     public Optional<List<FeatureFlag>> readAll() {
-        Map<String, FeatureFlag> featureFlags = LOCAL_CACHE.asMap();
+        Map<Long, FeatureFlag> featureFlags = LOCAL_CACHE.asMap();
         if (featureFlags == null) {
             log.error("Feature flags local cache is empty");
             return Optional.empty();
@@ -53,12 +52,16 @@ public class DefaultFeatureFlagLocalCache implements FeatureFlagCache {
     }
 
     @Override
-    public void put(String key, Optional<FeatureFlag> value) {
-        value.ifPresent(v -> LOCAL_CACHE.put(key, v));
+    public void put(long key, Optional<FeatureFlag> value) {
+        if (value.isPresent()) {
+            LOCAL_CACHE.put(key, value.get());
+        } else {
+            LOCAL_CACHE.invalidate(key);
+        }
     }
 
-    public void invalidateAll(){
+    public void invalidateAll() {
         LOCAL_CACHE.invalidateAll();
+        LOCAL_CACHE.cleanUp();
     }
 }
-

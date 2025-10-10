@@ -33,8 +33,11 @@ public class FeatureFlag {
         this.archivedAt = archivedAt;
     }
 
-    public String getKey() {
-        return name;
+    public long getId() {
+        if (id == null) {
+            throw new IllegalStateException("Feature flag id is not initialized");
+        }
+        return id;
     }
 
     public boolean evaluate(Map<String, String> criteria) {

@@ -14,10 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongConsumer;
 import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultFeatureFlagClientTest {
+    private static final AtomicLong idSequence = new AtomicLong(1);
     DefaultFeatureFlagClient sut;
 
     @DisplayName("create default feature flag client")
@@ -82,7 +84,7 @@ class DefaultFeatureFlagClientTest {
 
             scheduler.runCaptured();
             assertEquals(1, dataSource.callCount);
-            assertTrue(cache.get(featureFlag.getKey()).isPresent());
+            assertTrue(cache.get(featureFlag.getId()).isPresent());
             assertEquals(1, cache.loadCount);
         }
 
@@ -106,14 +108,15 @@ class DefaultFeatureFlagClientTest {
 
             assertEquals(1, dataSource.callCount);
             assertEquals(1, cache.loadCount);
-            assertTrue(cache.get(featureFlag.getKey()).isPresent());
+            assertTrue(cache.get(featureFlag.getId()).isPresent());
             assertEquals(1, listener.initializeCount);
 
-            listener.emit(featureFlag.getKey());
+            listener.emit(featureFlag.getId());
 
-            assertEquals(featureFlag.getKey(), cache.lastPutKey);
+            assertEquals(featureFlag.getId(), cache.lastPutKey);
             assertTrue(cache.lastPutValue.isPresent());
-            assertSame(cache.get(featureFlag.getKey()).orElseThrow(), cache.lastPutValue.orElseThrow());
+            assertSame(cache.get(featureFlag.getId()).orElseThrow(), cache.lastPutValue.orElseThrow());
+            assertEquals(1, dataSource.singleGetCount);
         }
     }
 
@@ -125,7 +128,7 @@ class DefaultFeatureFlagClientTest {
         void isEnabledEvaluatesFlag() {
             var cache = new RecordingCache();
             var flag = sampleFlag("enabled-flag");
-            cache.store.put(flag.getKey(), flag);
+            cache.store.put(flag.getId(), flag);
 
             sut = DefaultFeatureFlagClient.builder()
                     .source(new RecordingDataSource(Optional.empty()))
@@ -133,7 +136,7 @@ class DefaultFeatureFlagClientTest {
                     .updateMode(UpdateMode.STREAM)
                     .build();
 
-            var enabled = sut.isEnabled(flag.getKey(), Map.of());
+            var enabled = sut.isEnabled(flag.getId(), Map.of());
 
             assertTrue(enabled);
         }
@@ -149,7 +152,7 @@ class DefaultFeatureFlagClientTest {
                     .updateMode(UpdateMode.STREAM)
                     .build();
 
-            var enabled = sut.isEnabled("missing", Map.of());
+            var enabled = sut.isEnabled(999L, Map.of());
 
             assertFalse(enabled);
         }
@@ -160,8 +163,8 @@ class DefaultFeatureFlagClientTest {
             var cache = new RecordingCache();
             var flagOne = sampleFlag("all-1");
             var flagTwo = sampleFlag("all-2");
-            cache.store.put(flagOne.getKey(), flagOne);
-            cache.store.put(flagTwo.getKey(), flagTwo);
+            cache.store.put(flagOne.getId(), flagOne);
+            cache.store.put(flagTwo.getId(), flagTwo);
 
             sut = DefaultFeatureFlagClient.builder()
                     .source(new RecordingDataSource(Optional.empty()))
@@ -178,7 +181,7 @@ class DefaultFeatureFlagClientTest {
 
     private FeatureFlag sampleFlag(String name) {
         return FeatureFlag.builder()
-                .id(1L)
+                .id(idSequence.getAndIncrement())
                 .name(name)
                 .status(FeatureFlagStatus.ON)
                 .build();
@@ -199,14 +202,20 @@ class DefaultFeatureFlagClientTest {
     private static class RecordingDataSource implements FeatureFlagDataSource {
         private Optional<List<FeatureFlag>> toReturn;
         private int callCount;
+        private int singleGetCount;
+        private final Map<Long, FeatureFlag> byId = new HashMap<>();
 
         RecordingDataSource(Optional<List<FeatureFlag>> toReturn) {
             this.toReturn = toReturn;
+            toReturn.ifPresent(flags -> flags.forEach(flag -> {
+                byId.put(flag.getId(), flag);
+            }));
         }
 
         @Override
-        public FeatureFlag get(String featureFlagName) {
-            return null;
+        public FeatureFlag get(long featureFlagId) {
+            singleGetCount++;
+            return byId.get(featureFlagId);
         }
 
         @Override
@@ -214,12 +223,16 @@ class DefaultFeatureFlagClientTest {
             callCount++;
             return toReturn;
         }
+
+        void putFlag(FeatureFlag featureFlag) {
+            byId.put(featureFlag.getId(), featureFlag);
+        }
     }
 
     private static class RecordingCache implements FeatureFlagCache {
-        private final Map<String, FeatureFlag> store = new HashMap<>();
+        private final Map<Long, FeatureFlag> store = new HashMap<>();
         private int loadCount;
-        private String lastPutKey;
+        private Long lastPutKey;
         private Optional<FeatureFlag> lastPutValue = Optional.empty();
 
         @Override
@@ -227,12 +240,12 @@ class DefaultFeatureFlagClientTest {
             loadCount++;
             featureFlags.ifPresent(flags -> {
                 store.clear();
-                flags.forEach(flag -> store.put(flag.getKey(), flag));
+                flags.forEach(flag -> store.put(flag.getId(), flag));
             });
         }
 
         @Override
-        public Optional<FeatureFlag> get(String key) {
+        public Optional<FeatureFlag> get(long key) {
             return Optional.ofNullable(store.get(key));
         }
 
@@ -242,10 +255,14 @@ class DefaultFeatureFlagClientTest {
         }
 
         @Override
-        public void put(String key, Optional<FeatureFlag> value) {
+        public void put(long key, Optional<FeatureFlag> value) {
             lastPutKey = key;
             lastPutValue = value;
-            value.ifPresent(flag -> store.put(key, flag));
+            if (value.isPresent()) {
+                store.put(key, value.get());
+            } else {
+                store.remove(key);
+            }
         }
     }
 
@@ -273,10 +290,10 @@ class DefaultFeatureFlagClientTest {
 
     private static class TestStreamListener implements FeatureFlagStreamListener {
         private int initializeCount;
-        private Consumer<String> consumer;
+        private LongConsumer consumer;
 
         @Override
-        public void initialize(Consumer<String> onFeatureFlagUpdated) {
+        public void initialize(LongConsumer onFeatureFlagUpdated) {
             initializeCount++;
             this.consumer = onFeatureFlagUpdated;
         }
@@ -286,9 +303,9 @@ class DefaultFeatureFlagClientTest {
             // no-op for tests
         }
 
-        void emit(String featureFlagName) {
+        void emit(long featureFlagId) {
             if (consumer != null) {
-                consumer.accept(featureFlagName);
+                consumer.accept(featureFlagId);
             }
         }
     }

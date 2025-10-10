@@ -5,6 +5,6 @@ import com.featureflag.shared.model.*;
 import java.util.*;
 
 public interface FeatureFlagDataSource {
-    FeatureFlag get(String featureFlagName);
+    FeatureFlag get(long featureFlagId);
     Optional<List<FeatureFlag>> getFeatureFlags();
 }

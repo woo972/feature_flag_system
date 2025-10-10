@@ -32,7 +32,7 @@ public class FeatureFlagController {
 
     @GetMapping("/evaluate/{flag-id}")
     public ResponseEntity<Boolean> evaluate(
-            @PathVariable(value = "flag-id", required = true) Long flagId,
+            @PathVariable(value = "flag-id", required = true) long flagId,
             @RequestParam(value = "criteria", required = false) Map<String, String> criteria) {
         return ResponseEntity.ok(featureFlagQueryService.evaluate(flagId, criteria));
     }

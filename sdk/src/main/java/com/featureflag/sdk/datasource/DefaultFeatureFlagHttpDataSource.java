@@ -16,7 +16,7 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
     }
 
     @Override
-    public FeatureFlag get(String featureFlagName) {
+    public FeatureFlag get(long featureFlagId) {
         return null;
     }
 

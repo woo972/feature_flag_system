@@ -35,7 +35,7 @@ public class FeatureFlagCommandService {
 
     @CacheEvict(value = "featureFlags", key = "#id")
     @Transactional
-    public FeatureFlag on(Long id) {
+    public FeatureFlag on(long id) {
         FeatureFlagEntity entity = repository.findById(id)
                 .orElseThrow(() -> new FeatureFlagNotFoundException(id));
 
@@ -51,7 +51,7 @@ public class FeatureFlagCommandService {
 
     @CacheEvict(value = "featureFlags", key = "#id")
     @Transactional
-    public FeatureFlag off(Long id) {
+    public FeatureFlag off(long id) {
         FeatureFlagEntity entity = repository.findById(id)
                 .orElseThrow(() -> new FeatureFlagNotFoundException(id));
 
@@ -67,7 +67,7 @@ public class FeatureFlagCommandService {
 
     @CacheEvict(value = "featureFlags", key = "#id")
     @Transactional
-    public FeatureFlag archive(Long id) {
+    public FeatureFlag archive(long id) {
         FeatureFlagEntity entity = repository.findById(id)
                 .orElseThrow(() -> new FeatureFlagNotFoundException(id));
 

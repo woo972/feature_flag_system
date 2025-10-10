@@ -41,7 +41,7 @@ class FeatureFlagCommandServiceTest {
     @DisplayName("turn on feature flag when on method is called")
     @Test
     public void turnOnFeatureFlag() {
-        Long id = 1L;
+        long id = 1L;
         FeatureFlagEntity entity = new FeatureFlagEntity(
                 id,
                 "flag",
@@ -60,7 +60,7 @@ class FeatureFlagCommandServiceTest {
     @DisplayName("throw exception when on method is called and flag is already on")
     @Test
     public void throwExceptionWhenOnMethodIsCalledAndFlagIsAlreadyOn() {
-        Long id = 1L;
+        long id = 1L;
         FeatureFlagEntity entity = new FeatureFlagEntity(
                 id,
                 "flag",
@@ -80,7 +80,7 @@ class FeatureFlagCommandServiceTest {
     @DisplayName("turn off feature flag when off method is called")
     @Test
     public void turnOffFeatureFlag() {
-        Long id = 1L;
+        long id = 1L;
         FeatureFlagEntity entity = new FeatureFlagEntity(
                 id,
                 "flag",
@@ -99,7 +99,7 @@ class FeatureFlagCommandServiceTest {
     @DisplayName("throw exception when off method is called and flag is already on")
     @Test
     public void throwExceptionWhenOnMethodIsCalledAndFlagIsAlreadyOff() {
-        Long id = 1L;
+        long id = 1L;
         FeatureFlagEntity entity = new FeatureFlagEntity(
                 id,
                 "flag",
@@ -119,7 +119,7 @@ class FeatureFlagCommandServiceTest {
     @DisplayName("archive feature flag when archive method is called")
     @Test
     public void archiveFeatureFlag() {
-        Long id = 1L;
+        long id = 1L;
         FeatureFlagEntity entity = new FeatureFlagEntity(
                 id,
                 "flag",
@@ -138,7 +138,7 @@ class FeatureFlagCommandServiceTest {
     @DisplayName("throw exception when archive method is called and flag is already archived")
     @Test
     public void throwExceptionWhenArchiveMethodIsCalledAndFlagIsAlreadyArchived() {
-        Long id = 1L;
+        long id = 1L;
         FeatureFlagEntity entity = new FeatureFlagEntity(
                 id,
                 "flag",
