@@ -37,7 +37,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
                     var stream = connectStream();
                     listen(stream, onFeatureFlagUpdated);
                 } catch (Exception e) {
-                    log.error("Error in feature flag stream listener", e);
+                    log.error(" Error in feature flag stream listener", e);
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ex) {
@@ -51,7 +51,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
     }
 
     private InputStream connectStream() {
-        var response = featureFlagCoreHttpClient.connectStream(FEATURE_FLAG_STREAM_PATH, Map.of());
+        var response = featureFlagCoreHttpClient.connectStream(FEATURE_FLAG_STREAM_PATH, null);
 
         if (response == null) {
             throw new RuntimeException("Failed to connect to feature flag stream");
@@ -64,6 +64,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
         this.isConnected = true;
         this.clientId = response.headers().firstValue("X-Client-Id").orElseThrow();
 
+        log.info("Read feature flag connectStream. body={}, header={}", response.body(), response.headers());
         return response.body();
     }
 
@@ -100,6 +101,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
                     this.isConnected = false;
                 }
             }
+            log.info("Event stream data: {}", dataBuilder.toString());
         }catch (Exception e) {
             log.error("Error in feature flag stream listener", e);
         }

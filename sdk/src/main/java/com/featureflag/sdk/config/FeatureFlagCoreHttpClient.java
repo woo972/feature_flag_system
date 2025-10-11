@@ -26,7 +26,8 @@ public class FeatureFlagCoreHttpClient {
         }
         headers.put("Accept", List.of("text/event-stream"));
         headers.put("Cache-Control", List.of("no-cache"));
-        headers.put("Connection", List.of("keep-alive"));
+        // java.lang.IllegalArgumentException: restricted header name: "Connection"
+//        headers.put("Connection", List.of("keep-alive"));
 
         return this.get(url, headers, HttpResponse.BodyHandlers.ofInputStream());
     }
