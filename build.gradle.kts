@@ -1,5 +1,11 @@
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.xml.sax.InputSource
+import java.io.StringReader
+
 plugins {
     java
+    jacoco
 }
 
 allprojects {
@@ -15,10 +21,15 @@ subprojects {
     if (name != "frontend") {
 
         apply(plugin = "java")
+        apply(plugin = "jacoco")
 
         java {
             sourceCompatibility = JavaVersion.VERSION_21
             targetCompatibility = JavaVersion.VERSION_21
+        }
+
+        extensions.configure<JacocoPluginExtension>("jacoco") {
+            toolVersion = "0.8.10"
         }
 
         dependencies {
@@ -38,8 +49,62 @@ subprojects {
             testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
         }
 
-        tasks.test {
+        tasks.withType<Test>().configureEach {
             useJUnitPlatform()
+            finalizedBy(tasks.named("jacocoTestReport"))
+        }
+
+        tasks.withType<JacocoReport>().configureEach {
+            dependsOn(tasks.withType<Test>())
+            reports {
+                xml.required.set(true)
+                html.required.set(true)
+                csv.required.set(false)
+            }
+            doLast {
+                val xmlReport = reports.xml.outputLocation.get().asFile
+                if (!xmlReport.exists()) {
+                    println("JaCoCo :: ${project.path} xml report not found at ${xmlReport.absolutePath}")
+                    return@doLast
+                }
+
+                val factory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+                runCatching {
+                    factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+                    factory.setFeature("http://xml.org/sax/features/external-general-entities", false)
+                    factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+                }
+                factory.isValidating = false
+                factory.isNamespaceAware = false
+                val documentBuilder = factory.newDocumentBuilder().apply {
+                    setEntityResolver { publicId, systemId -> InputSource(StringReader(""))  }
+                }
+                val document = runCatching { documentBuilder.parse(xmlReport) }.getOrElse {
+                    println("JaCoCo :: ${project.path} failed to parse report: ${it.message}")
+                    return@doLast
+                }
+                val counters = document.getElementsByTagName("counter")
+                var covered = 0L
+                var missed = 0L
+                for (index in 0 until counters.length) {
+                    val node = counters.item(index)
+                    val attributes = node.attributes ?: continue
+                    val typeAttr = attributes.getNamedItem("type") ?: continue
+                    if (typeAttr.nodeValue == "LINE") {
+                        val coveredAttr = attributes.getNamedItem("covered")
+                        val missedAttr = attributes.getNamedItem("missed")
+                        if (coveredAttr != null) covered += coveredAttr.nodeValue.toLong()
+                        if (missedAttr != null) missed += missedAttr.nodeValue.toLong()
+                    }
+                }
+                val total = covered + missed
+                val coverage = if (total == 0L) 0.0 else covered * 100.0 / total
+                println(
+                    "JaCoCo :: ${project.path} line coverage: " +
+                            String.format("%.2f", coverage) +
+                            "% ($covered/$total lines covered)"
+                )
+            }
         }
     }
 }
