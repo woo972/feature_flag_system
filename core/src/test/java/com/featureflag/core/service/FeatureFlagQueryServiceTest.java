@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -139,5 +141,34 @@ class FeatureFlagQueryServiceTest {
         when(flagRepository.findById(flagId)).thenReturn(Optional.empty());
         boolean result = sut.evaluate(flagId, criteria);
         Assertions.assertFalse(result);
+    }
+
+    @DisplayName("returns last modified epoch time when repository has data")
+    @Test
+    void returnsLastModifiedEpochTime() {
+        LocalDateTime updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0);
+        FeatureFlagEntity entity = new FeatureFlagEntity(
+                1L,
+                "flag",
+                "description",
+                FeatureFlagStatus.ON,
+                null,
+                null,
+                updatedAt,
+                null
+        );
+        when(flagRepository.findTopByOrderByUpdatedAtDesc()).thenReturn(Optional.of(entity));
+
+        long result = sut.getLastModifiedEpochTime();
+
+        Assertions.assertEquals(updatedAt.toEpochSecond(ZoneOffset.UTC), result);
+    }
+
+    @DisplayName("returns zero when repository has no data")
+    @Test
+    void returnsZeroWhenNoFeatureFlags() {
+        when(flagRepository.findTopByOrderByUpdatedAtDesc()).thenReturn(Optional.empty());
+
+        Assertions.assertEquals(0L, sut.getLastModifiedEpochTime());
     }
 }

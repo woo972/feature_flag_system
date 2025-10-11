@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 
+import java.util.*;
+
 @Slf4j
 public class JsonConfig {
     @Getter
@@ -15,7 +17,17 @@ public class JsonConfig {
 
     public static <T> T readValue(String content) {
         try {
-            return objectMapper.readValue(content, new TypeReference<T>() {});
+            return objectMapper.readValue(content, new TypeReference<T>() {
+            });
+        } catch (Exception e) {
+            log.error("Failed to read value from json", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> List<T> readListValue(String content, Class<T> itemType) {
+        try {
+            return objectMapper.readValue(content, objectMapper.getTypeFactory().constructCollectionType(List.class, itemType));
         } catch (Exception e) {
             log.error("Failed to read value from json", e);
             throw new RuntimeException(e);

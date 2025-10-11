@@ -54,4 +54,25 @@ class FeatureFlagTest {
 
         assertTrue(featureFlag.evaluate(Map.of("region", "KR")));
     }
+
+    @DisplayName("returns id when present")
+    @Test
+    void getKeyReturnsId() {
+        var featureFlag = FeatureFlag.builder()
+                .id(42L)
+                .status(FeatureFlagStatus.ON)
+                .build();
+
+        assertEquals(42L, featureFlag.getId());
+    }
+
+    @DisplayName("throws when id is missing")
+    @Test
+    void getIdThrowsWhenIdMissing() {
+        var featureFlag = FeatureFlag.builder()
+                .status(FeatureFlagStatus.ON)
+                .build();
+
+        assertThrows(IllegalStateException.class, featureFlag::getId);
+    }
 }

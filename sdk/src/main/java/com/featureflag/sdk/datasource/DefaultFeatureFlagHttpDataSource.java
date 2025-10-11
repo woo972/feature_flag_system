@@ -4,6 +4,7 @@ import com.featureflag.sdk.config.*;
 import com.featureflag.shared.model.*;
 import lombok.extern.slf4j.*;
 import org.apache.commons.lang3.*;
+
 import java.util.*;
 
 @Slf4j
@@ -31,7 +32,7 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
         }
 
         var response = featureFlagCoreHttpClient.get(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH, headers);
-        if (response.statusCode() < 200 && response.statusCode() >= 400) {
+        if (response.statusCode() < 200 || response.statusCode() >= 400) {
             log.error("Failed to get feature flags. Status code: {}", response.statusCode());
             return Optional.empty();
         }
@@ -43,8 +44,7 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
 
         lastEtag = response.headers().firstValue("ETag").orElse(null);
 
-        return JsonConfig
-                .readValue(Optional.ofNullable(response.body()).orElse(StringUtils.EMPTY));
+        return Optional.ofNullable(JsonConfig.readListValue(response.body(), FeatureFlag.class));
     }
 
 }
