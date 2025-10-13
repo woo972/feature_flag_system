@@ -45,6 +45,7 @@ public class FeatureFlagEntity {
 
     public FeatureFlagEntity() {
         createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     public FeatureFlag toDomainModel() {

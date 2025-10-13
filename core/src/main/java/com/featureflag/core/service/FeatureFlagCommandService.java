@@ -1,16 +1,23 @@
 package com.featureflag.core.service;
 
-import com.featureflag.core.entity.*;
-import com.featureflag.core.event.*;
-import com.featureflag.core.repository.*;
-import com.featureflag.shared.exception.*;
-import com.featureflag.shared.model.*;
-import lombok.*;
-import org.springframework.cache.annotation.*;
-import org.springframework.context.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import java.time.*;
+import com.featureflag.core.entity.FeatureFlagEntity;
+import com.featureflag.core.entity.TargetingRuleEntity;
+import com.featureflag.core.event.FeatureFlagUpdatedEvent;
+import com.featureflag.core.repository.FeatureFlagRepository;
+import com.featureflag.shared.api.RegisterFeatureFlagRequest;
+import com.featureflag.shared.exception.FeatureFlagNotFoundException;
+import com.featureflag.shared.exception.FeatureFlagNotUpdatedException;
+import com.featureflag.shared.model.FeatureFlag;
+import com.featureflag.shared.model.FeatureFlagStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -19,13 +26,26 @@ public class FeatureFlagCommandService {
     private final ApplicationEventPublisher publisher;
 
     @Transactional
-    public void register(RegisterFeatureFlagRequest request) {
+    public FeatureFlag register(RegisterFeatureFlagRequest request) {
         FeatureFlagEntity entity = new FeatureFlagEntity();
         entity.setName(request.getName());
         entity.setDescription(request.getDescription());
-        repository.save(entity);
 
+        List<TargetingRuleEntity> rules = Optional.ofNullable(request.getTargetingRules())
+                .orElseGet(List::of)
+                .stream()
+                .map(rule -> {
+                    var ruleEntity = new TargetingRuleEntity();
+                    ruleEntity.setName(rule.getName());
+                    ruleEntity.setOperator(rule.getOperator());
+                    ruleEntity.setValues(rule.getValues());
+                    return ruleEntity;
+                }).toList();
 
+        entity.setTargetingRules(rules);
+
+        FeatureFlagEntity saved = repository.save(entity);
+        return saved.toDomainModel();
     }
 
     @CacheEvict(value = "featureFlags", allEntries = true)
