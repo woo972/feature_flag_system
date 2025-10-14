@@ -1,9 +1,10 @@
 package com.featureflag.shared.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class JacksonConfig {
     private static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
@@ -14,6 +15,7 @@ public class JacksonConfig {
 
     private static ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
 
         // Configure serialization
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);  // Don't serialize null values
@@ -40,5 +42,9 @@ public class JacksonConfig {
 
     public static ObjectMapper getObjectMapper() {
         return OBJECT_MAPPER;
+    }
+
+    public static ObjectMapper copyObjectMapper() {
+        return OBJECT_MAPPER.copy();
     }
 }

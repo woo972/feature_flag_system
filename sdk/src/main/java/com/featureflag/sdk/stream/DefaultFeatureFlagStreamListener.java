@@ -126,7 +126,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
     private long handleFeatureFlagUpdatedEvent(String data) {
         FeatureFlag featureFlag = null;
         try {
-            var objectMapper = JsonConfig.getObjectMapper();
+            var objectMapper = JsonParser.getObjectMapper();
             var eventNode = objectMapper.readTree(data);
 
             // Extract the FeatureFlag from the event source

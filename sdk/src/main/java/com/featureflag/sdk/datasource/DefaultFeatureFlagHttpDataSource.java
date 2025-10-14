@@ -44,7 +44,7 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
 
         lastEtag = response.headers().firstValue("ETag").orElse(null);
 
-        return Optional.ofNullable(JsonConfig.readListValue(response.body(), FeatureFlag.class));
+        return Optional.ofNullable(JsonParser.readListValue(response.body(), FeatureFlag.class));
     }
 
 }
