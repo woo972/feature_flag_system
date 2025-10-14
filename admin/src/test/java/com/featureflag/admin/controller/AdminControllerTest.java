@@ -2,7 +2,7 @@ package com.featureflag.admin.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.featureflag.admin.service.AdminFeatureFlagService;
-import com.featureflag.core.service.RegisterFeatureFlagRequest;
+import com.featureflag.shared.api.RegisterFeatureFlagRequest;
 import com.featureflag.shared.model.FeatureFlag;
 import com.featureflag.shared.model.FeatureFlagStatus;
 import org.junit.jupiter.api.DisplayName;

@@ -5,6 +5,7 @@ import com.featureflag.sdk.config.*;
 import com.featureflag.sdk.datasource.*;
 import com.featureflag.sdk.scheduler.*;
 import com.featureflag.sdk.stream.*;
+import com.featureflag.shared.http.CoreFeatureFlagClient;
 import com.featureflag.shared.model.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
@@ -21,7 +22,7 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
     @Builder
     public DefaultFeatureFlagClient(FeatureFlagDataSource source, FeatureFlagCache cache, UpdateMode updateMode) {
         if (source == null) {
-            source = new DefaultFeatureFlagHttpDataSource(new FeatureFlagCoreHttpClient());
+            source = new DefaultFeatureFlagHttpDataSource(new CoreFeatureFlagClient());
         }
         if (cache == null) {
             cache = new DefaultFeatureFlagLocalCache();

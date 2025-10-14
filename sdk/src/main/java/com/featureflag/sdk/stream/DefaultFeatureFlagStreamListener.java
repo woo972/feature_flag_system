@@ -1,10 +1,12 @@
 package com.featureflag.sdk.stream;
 
-import com.featureflag.sdk.config.*;
+import com.featureflag.shared.config.JsonParser;
+import com.featureflag.shared.http.CoreFeatureFlagClient;
+import com.featureflag.shared.http.CoreApiException;
 import com.featureflag.shared.model.*;
 import lombok.extern.slf4j.*;
 import java.io.*;
-import java.util.*;
+import java.net.URI;
 import java.util.concurrent.*;
 import java.util.function.LongConsumer;
 
@@ -15,7 +17,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
 
     private String clientId;
     private final ExecutorService executorService;
-    private final FeatureFlagCoreHttpClient featureFlagCoreHttpClient;
+    private final CoreFeatureFlagClient coreFeatureFlagClient;
     private volatile boolean isConnected = false;
     private volatile boolean isRunning = false;
 
@@ -25,7 +27,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
             thread.setDaemon(true);
             return thread;
         });
-        this.featureFlagCoreHttpClient = new FeatureFlagCoreHttpClient();
+        this.coreFeatureFlagClient = new CoreFeatureFlagClient();
     }
 
     @Override
@@ -51,21 +53,25 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
     }
 
     private InputStream connectStream() {
-        var response = featureFlagCoreHttpClient.connectStream(FEATURE_FLAG_STREAM_PATH, null);
+        try {
+            var response = coreFeatureFlagClient.connectStream(URI.create(FEATURE_FLAG_STREAM_PATH), null);
 
-        if (response == null) {
-            throw new RuntimeException("Failed to connect to feature flag stream");
+            if (response == null) {
+                throw new RuntimeException("Failed to connect to feature flag stream");
+            }
+
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Failed to connect to feature flag stream. Status code: " + response.statusCode());
+            }
+
+            this.isConnected = true;
+            this.clientId = response.headers().firstValue("X-Client-Id").orElseThrow();
+
+            log.info("Read feature flag connectStream. body={}, header={}", response.body(), response.headers());
+            return response.body();
+        } catch (CoreApiException e) {
+            throw new RuntimeException("Failed to connect to feature flag stream", e);
         }
-
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("Failed to connect to feature flag stream. Status code: " + response.statusCode());
-        }
-
-        this.isConnected = true;
-        this.clientId = response.headers().firstValue("X-Client-Id").orElseThrow();
-
-        log.info("Read feature flag connectStream. body={}, header={}", response.body(), response.headers());
-        return response.body();
     }
 
     private void listen(InputStream stream, LongConsumer onFeatureFlagUpdated) {

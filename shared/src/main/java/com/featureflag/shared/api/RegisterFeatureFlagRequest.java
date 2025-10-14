@@ -1,7 +1,12 @@
-package com.featureflag.core.service;
+package com.featureflag.shared.api;
 
 import com.featureflag.shared.model.TargetingRule;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
 @Getter

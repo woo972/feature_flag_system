@@ -1,6 +1,7 @@
 package com.featureflag.sdk.datasource;
 
 import com.featureflag.sdk.config.*;
+import com.featureflag.shared.http.CoreFeatureFlagClient;
 import com.featureflag.shared.model.FeatureFlag;
 import com.featureflag.shared.model.FeatureFlagStatus;
 import org.junit.jupiter.api.*;
@@ -8,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.net.URI;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 import java.util.List;
@@ -21,12 +23,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class DefaultFeatureFlagHttpDataSourceTest {
 
-    private FeatureFlagCoreHttpClient httpClient;
+    private CoreFeatureFlagClient httpClient;
     private DefaultFeatureFlagHttpDataSource dataSource;
 
     @BeforeEach
     void setUp() {
-        httpClient = mock(FeatureFlagCoreHttpClient.class);
+        httpClient = mock(CoreFeatureFlagClient.class);
         dataSource = new DefaultFeatureFlagHttpDataSource(httpClient);
     }
 
@@ -34,11 +36,11 @@ class DefaultFeatureFlagHttpDataSourceTest {
     @Test
     void returnsEmptyWhenServerError() {
         var response = mockResponse(500);
-        when(httpClient.get(anyString(), anyMap())).thenReturn(response);
+        when(httpClient.getRaw(any(URI.class), anyMap())).thenReturn(response);
 
         Optional<List<FeatureFlag>> result = dataSource.getFeatureFlags();
 
-        verify(httpClient).get(eq(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH), anyMap());
+        verify(httpClient).getRaw(eq(URI.create(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH)), anyMap());
         assertTrue(result.isEmpty());
     }
 
@@ -47,7 +49,7 @@ class DefaultFeatureFlagHttpDataSourceTest {
     void returnsEmptyWhenNotModified() {
         var firstResponse = mockResponse(200, "[]", Map.of("ETag", List.of("etag-1")));
         var secondResponse = mockResponse(304);
-        when(httpClient.get(anyString(), anyMap())).thenReturn(
+        when(httpClient.getRaw(any(URI.class), anyMap())).thenReturn(
                 firstResponse, secondResponse
         );
 
@@ -56,7 +58,7 @@ class DefaultFeatureFlagHttpDataSourceTest {
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<String, List<String>>> headersCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(httpClient, times(2)).get(eq(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH), headersCaptor.capture());
+        verify(httpClient, times(2)).getRaw(eq(URI.create(FeatureFlagProperty.GET_FEATURE_FLAGS_PATH)), headersCaptor.capture());
 
         Map<String, List<String>> secondCallHeaders = headersCaptor.getAllValues().get(1);
         assertEquals(List.of("\"etag-1\""), secondCallHeaders.get("If-None-Match"));
@@ -72,7 +74,7 @@ class DefaultFeatureFlagHttpDataSourceTest {
                 """;
 
         var response = mockResponse(200, json, Map.of("ETag", List.of("etag-2")));
-        when(httpClient.get(anyString(), anyMap())).thenReturn(response);
+        when(httpClient.getRaw(any(URI.class), anyMap())).thenReturn(response);
 
         Optional<List<FeatureFlag>> result = dataSource.getFeatureFlags();
 

@@ -1,15 +1,31 @@
 package com.featureflag.core.controller;
 
-import com.featureflag.core.service.*;
-import com.featureflag.shared.model.*;
+import com.featureflag.core.service.FeatureFlagCommandService;
+import com.featureflag.core.service.FeatureFlagQueryService;
+import com.featureflag.core.service.FeatureFlagStreamProvider;
+import com.featureflag.shared.api.RegisterFeatureFlagRequest;
+import com.featureflag.shared.model.FeatureFlag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,6 +44,37 @@ public class FeatureFlagController {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).eTag(eTag).build();
         }
         return ResponseEntity.ok(featureFlagQueryService.findAll());
+    }
+
+    @GetMapping("/{flag-id}")
+    public ResponseEntity<FeatureFlag> get(@PathVariable("flag-id") long flagId) {
+        return ResponseEntity.ok(featureFlagQueryService.get(flagId));
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<Page<FeatureFlag>> list(Pageable pageable) {
+        return ResponseEntity.ok(featureFlagQueryService.list(pageable));
+    }
+
+    @PostMapping
+    public ResponseEntity<FeatureFlag> register(@RequestBody RegisterFeatureFlagRequest request) {
+        var featureFlag = featureFlagCommandService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(featureFlag);
+    }
+
+    @PostMapping("/{flag-id}/on")
+    public ResponseEntity<FeatureFlag> on(@PathVariable("flag-id") long flagId) {
+        return ResponseEntity.ok(featureFlagCommandService.on(flagId));
+    }
+
+    @PostMapping("/{flag-id}/off")
+    public ResponseEntity<FeatureFlag> off(@PathVariable("flag-id") long flagId) {
+        return ResponseEntity.ok(featureFlagCommandService.off(flagId));
+    }
+
+    @PostMapping("/{flag-id}/archive")
+    public ResponseEntity<FeatureFlag> archive(@PathVariable("flag-id") long flagId) {
+        return ResponseEntity.ok(featureFlagCommandService.archive(flagId));
     }
 
     @GetMapping("/evaluate/{flag-id}")

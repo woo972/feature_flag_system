@@ -2,9 +2,8 @@ package com.featureflag.admin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication(scanBasePackages = {"com.featureflag.admin", "com.featureflag.core"})
+@SpringBootApplication
 public class AdminApplication {
     public static void main(String[] args) {
         SpringApplication.run(AdminApplication.class, args);

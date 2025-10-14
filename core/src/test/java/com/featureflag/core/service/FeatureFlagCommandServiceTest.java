@@ -1,15 +1,25 @@
 package com.featureflag.core.service;
 
-import com.featureflag.core.entity.*;
-import com.featureflag.core.repository.*;
-import com.featureflag.shared.exception.*;
-import com.featureflag.shared.model.*;
-import org.junit.jupiter.api.*;
-import org.springframework.context.*;
-import java.time.*;
-import java.util.*;
+import com.featureflag.core.entity.FeatureFlagEntity;
+import com.featureflag.core.repository.FeatureFlagRepository;
+import com.featureflag.shared.api.RegisterFeatureFlagRequest;
+import com.featureflag.shared.exception.FeatureFlagNotUpdatedException;
+import com.featureflag.shared.model.FeatureFlag;
+import com.featureflag.shared.model.FeatureFlagStatus;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
-import static org.mockito.Mockito.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class FeatureFlagCommandServiceTest {
 
@@ -33,9 +43,12 @@ class FeatureFlagCommandServiceTest {
                 .targetingRules(List.of())
                 .build();
 
-        sut.register(request);
+        when(flagRepository.save(any(FeatureFlagEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        FeatureFlag featureFlag = sut.register(request);
 
         verify(flagRepository).save(any(FeatureFlagEntity.class));
+        Assertions.assertNotNull(featureFlag);
     }
 
     @DisplayName("turn on feature flag when on method is called")
