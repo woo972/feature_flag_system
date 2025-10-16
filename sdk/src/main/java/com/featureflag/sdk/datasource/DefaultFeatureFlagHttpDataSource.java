@@ -26,7 +26,13 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
 
     @Override
     public FeatureFlag get(long featureFlagId) {
-        return null;
+        URI uri = URI.create(FeatureFlagProperty.FEATURE_FLAG_PATH + "/" + featureFlagId);
+        try {
+            return coreFeatureFlagClient.getJson(uri, Map.of("Accept", "application/json"), FeatureFlag.class);
+        } catch (CoreApiException e) {
+            log.error("Failed to fetch feature flag {} from core API", featureFlagId, e);
+            return null;
+        }
     }
 
     @Override

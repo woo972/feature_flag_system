@@ -57,6 +57,7 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
         } else if (UpdateMode.STREAM.equals(updateMode)) {
             var updatedFeatureFlags = source.getFeatureFlags();
             cache.load(updatedFeatureFlags);
+            // FeatureFlag data를 stream을 통해서 받기 때문에 Consumer<FeatureFlag> 를 받고, source 호출을 삭제해야 한다
             listener.initialize(changedFeatureFlagId ->
                     cache.put(changedFeatureFlagId, Optional.ofNullable(source.get(changedFeatureFlagId)))
             );

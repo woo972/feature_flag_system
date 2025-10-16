@@ -2,6 +2,7 @@ package com.featureflag.sdk.datasource;
 
 import com.featureflag.sdk.config.*;
 import com.featureflag.shared.http.CoreFeatureFlagClient;
+import com.featureflag.shared.http.CoreApiException;
 import com.featureflag.shared.model.FeatureFlag;
 import com.featureflag.shared.model.FeatureFlagStatus;
 import org.junit.jupiter.api.*;
@@ -9,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.net.URI;
 import java.net.URI;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
@@ -101,5 +103,37 @@ class DefaultFeatureFlagHttpDataSourceTest {
         HttpResponse<String> response = mock(HttpResponse.class);
         when(response.statusCode()).thenReturn(statusCode);
         return response;
+    }
+
+    @DisplayName("get fetches feature flag by id")
+    @Test
+    void getReturnsFeatureFlag() {
+        long id = 42L;
+        FeatureFlag featureFlag = FeatureFlag.builder()
+                .id(id)
+                .name("test-flag")
+                .description("desc")
+                .status(FeatureFlagStatus.ON)
+                .build();
+
+        when(httpClient.getJson(eq(URI.create(FeatureFlagProperty.FEATURE_FLAG_PATH + "/" + id)),
+                anyMap(), eq(FeatureFlag.class))).thenReturn(featureFlag);
+
+        FeatureFlag result = dataSource.get(id);
+
+        assertNotNull(result);
+        assertEquals(featureFlag, result);
+    }
+
+    @DisplayName("get returns null when core api throws error")
+    @Test
+    void getReturnsNullOnFailure() {
+        long id = 100L;
+        when(httpClient.getJson(eq(URI.create(FeatureFlagProperty.FEATURE_FLAG_PATH + "/" + id)),
+                anyMap(), eq(FeatureFlag.class))).thenThrow(new CoreApiException("boom"));
+
+        FeatureFlag result = dataSource.get(id);
+
+        assertNull(result);
     }
 }
