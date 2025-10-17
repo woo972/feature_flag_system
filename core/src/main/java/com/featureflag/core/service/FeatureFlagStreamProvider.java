@@ -20,7 +20,10 @@ public class FeatureFlagStreamProvider {
 
         emitters.put(clientId, sseEmitter);
 
-        sseEmitter.onCompletion(() -> log.debug("emitter completed for client {}", clientId));
+        sseEmitter.onCompletion(() -> {
+            emitters.remove(clientId);
+            log.debug("emitter completed for client {}", clientId);
+        });
         sseEmitter.onTimeout(() -> {
             log.error("Client {} timed out from feature flag event stream", clientId);
             emitters.remove(clientId);
