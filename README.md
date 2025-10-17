@@ -37,16 +37,6 @@ Common utilities and models shared across modules.
 2. Build the project: `./gradlew clean build`
 3. Run tests: `./gradlew test`
 
-## Containerized Test Execution
-
-A reproducible Gradle environment is available for running the JVM test suite in isolation.
-
-1. Ensure Docker Desktop (or another Docker Engine) is running.
-2. Execute all module tests inside the container: `make test-container`
-3. Pass custom Gradle tasks when needed: `make test-container ARGS="clean :core:test"`
-
-Test reports are emitted to `build/` on the host workspace, and the Docker socket is mounted so Testcontainers-based integration tests can launch dependency containers without extra setup.
-
 ## To do
 1. Local cache for core module in local profile
 2. Real DB and Redis connection for core module
