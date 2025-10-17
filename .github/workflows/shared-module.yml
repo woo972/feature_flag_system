@@ -1,0 +1,85 @@
+name: Shared Module CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "shared/**"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - ".github/workflows/shared-module.yml"
+  pull_request:
+    paths:
+      - "shared/**"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - ".github/workflows/shared-module.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: gradle
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Make Gradle executable
+        run: chmod +x gradlew
+
+      - name: Run shared module tests
+        run: ./gradlew :shared:test
+
+      - name: Summarize JaCoCo coverage
+        if: always()
+        run: |
+          python <<'PY'
+          import os
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          report_path = Path("shared/build/reports/jacoco/test/jacocoTestReport.xml")
+          if not report_path.exists():
+              print(f"Coverage report not found: {report_path}")
+              raise SystemExit(0)
+
+          tree = ET.parse(report_path)
+          line_counter = next((c for c in tree.findall(".//counter") if c.attrib.get("type") == "LINE"), None)
+          if line_counter is None:
+              print("No LINE counter found in coverage report")
+              raise SystemExit(0)
+
+          covered = int(line_counter.attrib.get("covered", 0))
+          missed = int(line_counter.attrib.get("missed", 0))
+          total = covered + missed
+          coverage = (covered / total * 100) if total else 0.0
+
+          summary_line = f"Shared module line coverage: {coverage:.2f}% ({covered}/{total} lines)"
+          print(summary_line)
+
+          step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          if step_summary:
+              with open(step_summary, "a", encoding="utf-8") as handle:
+                  handle.write(summary_line + "\n")
+          PY
+
+      - name: Build Docker image
+        run: docker build -f shared/Dockerfile -t feature-flag-shared:ci .
+
+      - name: Upload JaCoCo report artifact
+        if: always() && hashFiles('shared/build/reports/jacoco/test/jacocoTestReport.xml') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared-jacoco-report
+          path: shared/build/reports/jacoco/test/jacocoTestReport.xml
