@@ -34,11 +34,11 @@ public class FeatureFlagCommandService {
         List<TargetingRuleEntity> rules = Optional.ofNullable(request.getTargetingRules())
                 .orElseGet(List::of)
                 .stream()
-                .map(rule -> {
+                .map(ruleRequest -> {
                     var ruleEntity = new TargetingRuleEntity();
-                    ruleEntity.setName(rule.getName());
-                    ruleEntity.setOperator(rule.getOperator());
-                    ruleEntity.setValues(rule.getValues());
+                    ruleEntity.setName(ruleRequest.getName());
+                    ruleEntity.setOperator(ruleRequest.getOperator());
+                    ruleEntity.setValues(ruleRequest.getValues());
                     return ruleEntity;
                 }).toList();
 

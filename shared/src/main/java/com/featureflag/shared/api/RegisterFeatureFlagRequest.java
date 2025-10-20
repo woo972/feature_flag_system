@@ -1,6 +1,6 @@
 package com.featureflag.shared.api;
 
-import com.featureflag.shared.model.TargetingRule;
+import com.featureflag.shared.api.targeting.TargetingRuleRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -24,5 +24,5 @@ public class RegisterFeatureFlagRequest {
     @Size(max = 512)
     private String description;
     @Valid
-    private List<TargetingRule> targetingRules;
+    private List<TargetingRuleRequest> targetingRules;
 }
