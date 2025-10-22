@@ -1,13 +1,20 @@
 package com.featureflag.sdk.stream;
 
-import com.featureflag.shared.config.JsonParser;
-import com.featureflag.shared.http.CoreFeatureFlagClient;
+import com.featureflag.shared.constants.HttpHeaderNames;
 import com.featureflag.shared.http.CoreApiException;
-import com.featureflag.shared.model.*;
-import lombok.extern.slf4j.*;
-import java.io.*;
+import com.featureflag.shared.http.CoreFeatureFlagClient;
+import com.featureflag.shared.model.FeatureFlag;
+import com.featureflag.shared.util.JsonUtils;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.LongConsumer;
 
 import static com.featureflag.sdk.config.FeatureFlagProperty.FEATURE_FLAG_STREAM_PATH;
@@ -65,7 +72,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
             }
 
             this.isConnected = true;
-            this.clientId = response.headers().firstValue("X-Client-Id").orElseThrow();
+            this.clientId = response.headers().firstValue(HttpHeaderNames.X_CLIENT_ID).orElseThrow();
 
             log.info("Read feature flag connectStream. body={}, header={}", response.body(), response.headers());
             return response.body();
@@ -132,7 +139,7 @@ public class DefaultFeatureFlagStreamListener implements FeatureFlagStreamListen
     private long handleFeatureFlagUpdatedEvent(String data) {
         FeatureFlag featureFlag = null;
         try {
-            var objectMapper = JsonParser.getObjectMapper();
+            var objectMapper = JsonUtils.getObjectMapper();
             var eventNode = objectMapper.readTree(data);
 
             // Extract the FeatureFlag from the event source

@@ -3,7 +3,9 @@ package com.featureflag.shared.http;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.featureflag.shared.config.JacksonConfig;
-import com.featureflag.shared.config.JsonParser;
+import com.featureflag.shared.constants.HttpHeaderNames;
+import com.featureflag.shared.constants.HttpHeaderValues;
+import com.featureflag.shared.util.JsonUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +55,7 @@ public class CoreFeatureFlagClient {
 
     public <T> T getJson(URI uri, Map<String, String> headers, JavaType responseType) {
         HttpRequest request = requestBuilder(uri, toMultiValue(headers))
-                .header("Accept", "application/json")
+                .header(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
                 .GET()
                 .build();
 
@@ -69,8 +71,8 @@ public class CoreFeatureFlagClient {
     public <T> T postJson(URI uri, Map<String, String> headers, Object payload, JavaType responseType) {
         String body = payload == null ? "" : serializePayload(payload);
         HttpRequest.Builder builder = requestBuilder(uri, toMultiValue(headers))
-                .header("Accept", "application/json")
-                .header("Content-Type", "application/json");
+                .header(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
+                .header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
 
         HttpRequest request = builder
                 .POST(payload == null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(body))
@@ -93,8 +95,8 @@ public class CoreFeatureFlagClient {
 
     public HttpResponse<InputStream> connectStream(URI uri, Map<String, String> headers) {
         Map<String, List<String>> merged = toMultiValue(headers);
-        merged.computeIfAbsent("Accept", key -> new ArrayList<>()).add("text/event-stream");
-        merged.computeIfAbsent("Cache-Control", key -> new ArrayList<>()).add("no-cache");
+        merged.computeIfAbsent(HttpHeaderNames.ACCEPT, key -> new ArrayList<>()).add(HttpHeaderValues.TEXT_EVENT_STREAM);
+        merged.computeIfAbsent(HttpHeaderNames.CACHE_CONTROL, key -> new ArrayList<>()).add(HttpHeaderValues.NO_CACHE);
 
         HttpRequest request = requestBuilder(uri, merged)
                 .GET()
@@ -151,7 +153,7 @@ public class CoreFeatureFlagClient {
             return null;
         }
         try {
-            return JsonParser.readValue(objectMapper, body, responseType);
+            return JsonUtils.readValue(objectMapper, body, responseType);
         } catch (RuntimeException e) {
             throw new CoreApiException("Failed to parse Core API response", e);
         }
@@ -159,7 +161,7 @@ public class CoreFeatureFlagClient {
 
     private String serializePayload(Object payload) {
         try {
-            return JsonParser.writeValue(objectMapper, payload);
+            return JsonUtils.writeValue(objectMapper, payload);
         } catch (RuntimeException e) {
             throw new CoreApiException("Failed to serialize request body", e);
         }

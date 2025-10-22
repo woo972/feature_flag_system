@@ -4,6 +4,7 @@ import com.featureflag.core.service.FeatureFlagCommandService;
 import com.featureflag.core.service.FeatureFlagQueryService;
 import com.featureflag.core.service.FeatureFlagStreamProvider;
 import com.featureflag.shared.api.RegisterFeatureFlagRequest;
+import com.featureflag.shared.constants.HttpHeaderNames;
 import com.featureflag.shared.model.FeatureFlag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -101,7 +102,7 @@ public class FeatureFlagController {
         SseEmitter emitter = featureFlagStreamProvider.initiateConnection(clientId);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Client-Id", clientId);
+        headers.add(HttpHeaderNames.X_CLIENT_ID, clientId);
         return new ResponseEntity<>(emitter, headers, HttpStatus.OK);
     }
 }

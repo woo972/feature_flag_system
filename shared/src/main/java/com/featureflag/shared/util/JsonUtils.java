@@ -1,16 +1,18 @@
-package com.featureflag.shared.config;
+package com.featureflag.shared.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.featureflag.shared.config.JacksonConfig;
+import com.featureflag.shared.exception.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
-public final class JsonParser {
+public final class JsonUtils {
 
-    private JsonParser() {
+    private JsonUtils() {
     }
 
     public static ObjectMapper getObjectMapper() {
@@ -30,7 +32,7 @@ public final class JsonParser {
             return mapper.readValue(content, type);
         } catch (Exception e) {
             log.error("Failed to read value from json", e);
-            throw new RuntimeException(e);
+            throw new JsonProcessingException("Failed to deserialize JSON to %s".formatted(type.getSimpleName()), e);
         }
     }
 
@@ -39,7 +41,7 @@ public final class JsonParser {
             return mapper.readValue(content, type);
         } catch (Exception e) {
             log.error("Failed to read value from json", e);
-            throw new RuntimeException(e);
+            throw new JsonProcessingException("Failed to deserialize JSON to %s".formatted(type), e);
         }
     }
 
@@ -48,7 +50,7 @@ public final class JsonParser {
             return mapper.readValue(content, typeReference);
         } catch (Exception e) {
             log.error("Failed to read value from json", e);
-            throw new RuntimeException(e);
+            throw new JsonProcessingException("Failed to deserialize JSON using type reference", e);
         }
     }
 
@@ -65,7 +67,7 @@ public final class JsonParser {
             return mapper.readValue(content, mapper.getTypeFactory().constructCollectionType(List.class, itemType));
         } catch (Exception e) {
             log.error("Failed to read list value from json", e);
-            throw new RuntimeException(e);
+            throw new JsonProcessingException("Failed to deserialize JSON array to List<%s>".formatted(itemType.getSimpleName()), e);
         }
     }
 
@@ -74,7 +76,7 @@ public final class JsonParser {
             return mapper.writeValueAsString(value);
         } catch (Exception e) {
             log.error("Failed to write value to json", e);
-            throw new RuntimeException(e);
+            throw new JsonProcessingException("Failed to serialize %s to JSON".formatted(value.getClass().getSimpleName()), e);
         }
     }
 }

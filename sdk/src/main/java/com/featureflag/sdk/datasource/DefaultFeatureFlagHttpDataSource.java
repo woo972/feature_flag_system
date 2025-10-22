@@ -1,10 +1,12 @@
 package com.featureflag.sdk.datasource;
 
 import com.featureflag.sdk.config.FeatureFlagProperty;
-import com.featureflag.shared.config.JsonParser;
-import com.featureflag.shared.http.CoreFeatureFlagClient;
+import com.featureflag.shared.constants.HttpHeaderNames;
+import com.featureflag.shared.constants.HttpHeaderValues;
 import com.featureflag.shared.http.CoreApiException;
+import com.featureflag.shared.http.CoreFeatureFlagClient;
 import com.featureflag.shared.model.FeatureFlag;
+import com.featureflag.shared.util.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,7 +30,9 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
     public FeatureFlag get(long featureFlagId) {
         URI uri = URI.create(FeatureFlagProperty.FEATURE_FLAG_PATH + "/" + featureFlagId);
         try {
-            return coreFeatureFlagClient.getJson(uri, Map.of("Accept", "application/json"), FeatureFlag.class);
+            return coreFeatureFlagClient.getJson(uri,
+                    Map.of(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON),
+                    FeatureFlag.class);
         } catch (CoreApiException e) {
             log.error("Failed to fetch feature flag {} from core API", featureFlagId, e);
             return null;
@@ -38,11 +42,11 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
     @Override
     public Optional<List<FeatureFlag>> getFeatureFlags() {
         Map<String, List<String>> headers = new HashMap<>();
-        headers.put("Content-Type", List.of("application/json"));
+        headers.put(HttpHeaderNames.CONTENT_TYPE, List.of(HttpHeaderValues.APPLICATION_JSON));
 
         if (StringUtils.isNotEmpty(lastEtag)) {
             log.debug("send if-none-match header: {}", lastEtag);
-            headers.put("If-None-Match", List.of("\"" + lastEtag + "\""));
+            headers.put(HttpHeaderNames.IF_NONE_MATCH, List.of("\"" + lastEtag + "\""));
         }
 
         HttpResponse<String> response;
@@ -63,9 +67,9 @@ public class DefaultFeatureFlagHttpDataSource implements FeatureFlagDataSource {
             return Optional.empty();
         }
 
-        lastEtag = response.headers().firstValue("ETag").orElse(null);
+        lastEtag = response.headers().firstValue(HttpHeaderNames.ETAG).orElse(null);
 
-        return Optional.ofNullable(JsonParser.readListValue(response.body(), FeatureFlag.class));
+        return Optional.ofNullable(JsonUtils.readListValue(response.body(), FeatureFlag.class));
     }
 
 }

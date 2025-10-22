@@ -1,6 +1,8 @@
 package com.featureflag.shared.http;
 
-public class CoreApiException extends RuntimeException {
+import com.featureflag.shared.exception.FeatureFlagException;
+
+public class CoreApiException extends FeatureFlagException {
     public CoreApiException(String message) {
         super(message);
     }
