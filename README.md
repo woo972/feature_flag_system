@@ -37,16 +37,64 @@ Common utilities and models shared across modules.
 2. Build the project: `./gradlew clean build`
 3. Run tests: `./gradlew test`
 
+### Code Quality Tools
+
+This project uses three linting tools to ensure code quality:
+
+#### Checkstyle
+Checks for coding standards and style violations.
+```bash
+# Run Checkstyle on all modules
+./gradlew checkstyleMain checkstyleTest
+
+# Run on specific module
+./gradlew :core:checkstyleMain
+```
+Reports are generated at: `build/reports/checkstyle/`
+
+#### PMD
+Detects code quality issues and potential bugs.
+```bash
+# Run PMD on all modules
+./gradlew pmdMain pmdTest
+
+# Run on specific module
+./gradlew :core:pmdMain
+```
+Reports are generated at: `build/reports/pmd/`
+
+#### SpotBugs
+Finds bugs through static analysis.
+```bash
+# Run SpotBugs on all modules
+./gradlew spotbugsMain spotbugsTest
+
+# Run on specific module
+./gradlew :core:spotbugsMain
+```
+Reports are generated at: `build/reports/spotbugs/`
+
+#### Run All Linters
+```bash
+# Run all linters at once
+./gradlew check
+```
+
+Configuration files:
+- Checkstyle: `config/checkstyle/checkstyle.xml`
+- PMD: `config/pmd/ruleset.xml`
+- SpotBugs: Configured in `build.gradle.kts`
+
 ## To do
 1. Local cache for core module in local profile
 2. Real DB and Redis connection for core module
 3. Replace frontend with React
 4. Add Integration tests
 6. Add SonarQube to check code quality
-7. Add GitHub Actions for CI/CD
+7. Add GitHub Actions for CI/CD (done)
 9. Add Linter or add convention.md for the agent
-8. Add Docker for containerization
-9. Shared module refactoring (Util, Exception, Constants)
+8. Add Docker for containerization (done)
+9. Shared module refactoring (Util, Exception, Constants) (done)
 10. Shared model, dto refactoring (FeatureFlag, TargetingRule, RegionRule, xxxRequest, xxxResponse, etc)
 11. <high> Does TargetingRule should be separated entity?
 12. <high> TargetingRule Support when registration
