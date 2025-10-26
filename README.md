@@ -92,7 +92,7 @@ Configuration files:
 4. Add Integration tests
 6. Add SonarQube to check code quality
 7. Add GitHub Actions for CI/CD (done)
-9. Add Linter or add convention.md for the agent
+9. Add Linter or add convention.md for the agent (done)
 8. Add Docker for containerization (done)
 9. Shared module refactoring (Util, Exception, Constants) (done)
 10. Shared model, dto refactoring (FeatureFlag, TargetingRule, RegionRule, xxxRequest, xxxResponse, etc)
@@ -105,6 +105,8 @@ Configuration files:
 17. Support pre-defined targeting rule
 18. <mid> Authz, Authn for admin module
 19. Add error page for input validation
+20. spring security for core module interaction
+21. spring security for admin module
 
 ## License
 
