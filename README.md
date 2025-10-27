@@ -85,6 +85,29 @@ Configuration files:
 - PMD: `config/pmd/ruleset.xml`
 - SpotBugs: Configured in `build.gradle.kts`
 
+### Security
+
+The Core module uses Spring Security with API key authentication for SDK clients.
+
+#### API Key Authentication
+SDK clients must include an `X-API-Key` header in all requests to protected endpoints.
+
+**Create an API key:**
+```bash
+curl -X POST http://localhost:8082/api/v1/api-keys \
+  -H "Content-Type: application/json" \
+  -d '{"name": "My SDK Client", "description": "Production SDK"}'
+```
+
+**Use the API key in SDK:**
+```java
+FeatureFlagProperty.API_KEY = "your-api-key-here";
+FeatureFlagClient client = DefaultFeatureFlagClient.builder().build();
+client.initialize();
+```
+
+For detailed security documentation, see [SECURITY.md](SECURITY.md)
+
 ## To do
 1. Local cache for core module in local profile
 2. Real DB and Redis connection for core module
@@ -105,7 +128,7 @@ Configuration files:
 17. Support pre-defined targeting rule
 18. <mid> Authz, Authn for admin module
 19. Add error page for input validation
-20. spring security for core module interaction
+20. spring security for core module interaction (done)
 21. spring security for admin module
 
 ## License
