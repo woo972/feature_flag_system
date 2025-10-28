@@ -5,4 +5,8 @@ public class FeatureFlagProperty {
     public static final String FEATURE_FLAG_PATH = BASE_URL +"/api/v1/feature-flags";
     public static final String GET_FEATURE_FLAGS_PATH = FEATURE_FLAG_PATH;
     public static final String FEATURE_FLAG_STREAM_PATH = FEATURE_FLAG_PATH +"/event-stream";
+
+    // API Key for authentication with Core module
+    // This should be set via configuration or environment variable in production
+    public static String API_KEY = null;
 }

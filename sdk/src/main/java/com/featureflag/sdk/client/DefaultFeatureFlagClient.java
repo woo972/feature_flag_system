@@ -22,7 +22,11 @@ public class DefaultFeatureFlagClient implements FeatureFlagClient {
     @Builder
     public DefaultFeatureFlagClient(FeatureFlagDataSource source, FeatureFlagCache cache, UpdateMode updateMode) {
         if (source == null) {
-            source = new DefaultFeatureFlagHttpDataSource(new CoreFeatureFlagClient());
+            // Use API key from configuration if available
+            CoreFeatureFlagClient coreClient = FeatureFlagProperty.API_KEY != null
+                    ? new CoreFeatureFlagClient(FeatureFlagProperty.API_KEY)
+                    : new CoreFeatureFlagClient();
+            source = new DefaultFeatureFlagHttpDataSource(coreClient);
         }
         if (cache == null) {
             cache = new DefaultFeatureFlagLocalCache();

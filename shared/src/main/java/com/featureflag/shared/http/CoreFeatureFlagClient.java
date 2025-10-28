@@ -24,17 +24,28 @@ import java.util.Objects;
 
 public class CoreFeatureFlagClient {
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(5);
+    private static final String API_KEY_HEADER = "X-API-Key";
 
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+    private final String apiKey;
 
     public CoreFeatureFlagClient() {
-        this(defaultHttpClient(), JacksonConfig.getObjectMapper());
+        this(defaultHttpClient(), JacksonConfig.getObjectMapper(), null);
+    }
+
+    public CoreFeatureFlagClient(String apiKey) {
+        this(defaultHttpClient(), JacksonConfig.getObjectMapper(), apiKey);
     }
 
     public CoreFeatureFlagClient(HttpClient httpClient, ObjectMapper objectMapper) {
+        this(httpClient, objectMapper, null);
+    }
+
+    public CoreFeatureFlagClient(HttpClient httpClient, ObjectMapper objectMapper, String apiKey) {
         this.httpClient = Objects.requireNonNull(httpClient, "httpClient must not be null");
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper must not be null");
+        this.apiKey = apiKey;
     }
 
     private static HttpClient defaultHttpClient() {
@@ -107,6 +118,12 @@ public class CoreFeatureFlagClient {
     private HttpRequest.Builder requestBuilder(URI uri, Map<String, List<String>> headers) {
         HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
                 .timeout(REQUEST_TIMEOUT);
+
+        // Add API key header if configured
+        if (apiKey != null && !apiKey.isBlank()) {
+            builder.header(API_KEY_HEADER, apiKey);
+        }
+
         if (headers != null) {
             headers.forEach((key, values) -> {
                 if (values != null) {
