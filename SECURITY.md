@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Feature Flag System uses Spring Security with API key-based authentication to secure communication between the SDK clients and the Core module.
+The Feature Flag System uses Spring Security with API key-based authentication to secure communication between the SDK clients and the Core module. The implementation follows Domain-Driven Design (DDD) principles with clear separation of concerns.
 
 ## Architecture
 
@@ -10,27 +10,47 @@ The Feature Flag System uses Spring Security with API key-based authentication t
 
 The system implements API key authentication using the `X-API-Key` header. SDK clients must include a valid API key in all requests to protected endpoints.
 
-### Components
+### Components (DDD Architecture)
 
-1. **ApiKeyEntity** (`core/entity/ApiKeyEntity.java`)
-   - Stores API key information in the database
-   - Fields: id, apiKey, name, description, active, createdAt, lastUsedAt, expiresAt
+For detailed DDD architecture documentation, see [API_KEY_DDD_ARCHITECTURE.md](API_KEY_DDD_ARCHITECTURE.md)
 
-2. **ApiKeyAuthenticationFilter** (`core/security/ApiKeyAuthenticationFilter.java`)
-   - Intercepts incoming requests
-   - Validates API keys from the `X-API-Key` header
-   - Updates last used timestamp
-   - Checks for expiration
+**Domain Layer:**
+1. **ApiKey** (`core/apikey/domain/model/ApiKey.java`)
+   - Rich domain entity with business logic
+   - Methods: isValid(), revoke(), activate(), recordUsage()
+   - Enforces business rules and invariants
 
-3. **SecurityConfig** (`core/config/SecurityConfig.java`)
+2. **ApiKeyValue** (`core/apikey/domain/model/ApiKeyValue.java`)
+   - Value object for API key string
+   - Generates secure random keys
+   - Provides masking for security
+
+**Application Layer:**
+3. **ApiKeyApplicationService** (`core/apikey/application/service/ApiKeyApplicationService.java`)
+   - Orchestrates use cases
+   - Transaction management
+   - Delegates to domain model for business logic
+
+**Infrastructure Layer:**
+4. **ApiKeyJpaEntity** (`core/apikey/infrastructure/persistence/ApiKeyJpaEntity.java`)
+   - JPA entity for database mapping
+   - Converts between domain model and database
+
+5. **ApiKeyAuthenticationFilter** (`core/apikey/infrastructure/security/ApiKeyAuthenticationFilter.java`)
+   - Spring Security filter
+   - Validates API keys through domain model
+   - Records usage through application service
+
+6. **SecurityConfig** (`core/config/SecurityConfig.java`)
    - Configures Spring Security
    - Defines endpoint authorization rules
    - Disables CSRF for stateless API
    - Configures session management
 
-4. **ApiKeyService** (`core/service/ApiKeyService.java`)
-   - Manages API key lifecycle (create, revoke, activate, delete)
-   - Generates secure random API keys using SecureRandom
+**Presentation Layer:**
+7. **ApiKeyController** (`core/apikey/presentation/controller/ApiKeyController.java`)
+   - REST endpoints for API key management
+   - Thin layer delegating to application service
 
 ## API Endpoints
 
@@ -67,12 +87,14 @@ CREATE TABLE api_keys (
     api_key VARCHAR(64) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
-    active BOOLEAN NOT NULL DEFAULT true,
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_used_at TIMESTAMP,
     expires_at TIMESTAMP
 );
 ```
+
+**Note:** The `status` column uses enum values: `ACTIVE` or `REVOKED`.
 
 Run the migration script: `core/src/main/resources/db/migration/V001__create_api_keys_table.sql`
 

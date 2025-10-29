@@ -1,6 +1,6 @@
 package com.featureflag.core.config;
 
-import com.featureflag.core.security.ApiKeyAuthenticationFilter;
+import com.featureflag.core.apikey.infrastructure.security.ApiKeyAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

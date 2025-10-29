@@ -87,7 +87,16 @@ Configuration files:
 
 ### Security
 
-The Core module uses Spring Security with API key authentication for SDK clients.
+The Core module uses Spring Security with API key authentication for SDK clients. The implementation follows **Domain-Driven Design (DDD)** principles with clear separation of concerns.
+
+#### Architecture
+The API key module is structured in DDD layers:
+- **Domain Layer**: Rich domain model with business logic (ApiKey, ApiKeyValue, ApiKeyStatus)
+- **Application Layer**: Use case orchestration (ApiKeyApplicationService)
+- **Infrastructure Layer**: JPA entities, repositories, security filters
+- **Presentation Layer**: REST controllers
+
+For detailed DDD architecture, see [API_KEY_DDD_ARCHITECTURE.md](API_KEY_DDD_ARCHITECTURE.md)
 
 #### API Key Authentication
 SDK clients must include an `X-API-Key` header in all requests to protected endpoints.

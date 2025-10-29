@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./gradlew:*)"
+      "Bash(./gradlew:*)",
+      "Bash(core/src/main/java/com/featureflag/core/repository/ApiKeyRepository.java )",
+      "Bash(core/src/main/java/com/featureflag/core/security/ApiKeyAuthenticationFilter.java )",
+      "Bash(core/src/main/java/com/featureflag/core/security/ApiKeyAuthenticationToken.java )",
+      "Bash(core/src/main/java/com/featureflag/core/service/ApiKeyService.java )",
+      "Bash(core/src/main/java/com/featureflag/core/controller/ApiKeyController.java )",
+      "Bash(core/src/main/java/com/featureflag/core/dto/CreateApiKeyRequest.java )",
+      "Bash(core/src/main/java/com/featureflag/core/dto/ApiKeyResponse.java)"
     ],
     "deny": [],
     "ask": []

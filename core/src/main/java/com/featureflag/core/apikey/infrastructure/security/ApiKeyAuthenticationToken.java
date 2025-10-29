@@ -1,10 +1,14 @@
-package com.featureflag.core.security;
+package com.featureflag.core.apikey.infrastructure.security;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collections;
 
+/**
+ * Authentication token for API key authentication.
+ * Part of the infrastructure layer.
+ */
 public class ApiKeyAuthenticationToken extends AbstractAuthenticationToken {
     private static final long serialVersionUID = 1L;
 
