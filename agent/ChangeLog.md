@@ -24,4 +24,5 @@
 18. <mid> Authz, Authn for admin module
 19. Add error page for input validation
 20. spring security for core module interaction (done)
-21. spring security for admin module
+21. spring security for admin module (done)
+22. Add request for registration of admin process   
