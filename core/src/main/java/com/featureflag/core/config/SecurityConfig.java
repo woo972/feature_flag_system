@@ -1,5 +1,6 @@
 package com.featureflag.core.config;
 
+import com.featureflag.core.admin.infrastructure.security.JwtAuthenticationFilter;
 import com.featureflag.core.apikey.infrastructure.security.ApiKeyAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -24,12 +26,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints (health checks, etc.)
+                        // Public endpoints
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/api/v1/admin/auth/**").permitAll()
 
-                        // API Key management endpoints - should be protected by admin authentication
-                        // For now, we'll allow these to be accessed, but in production you'd add admin auth
-                        .requestMatchers("/api/v1/api-keys/**").permitAll()
+                        // Admin endpoints - require JWT authentication with ADMIN or SUPER_ADMIN role
+                        .requestMatchers("/api/v1/api-keys/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/feature-flags").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/feature-flags/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/feature-flags/page").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/feature-flags/cache/refresh").hasAnyRole("ADMIN", "SUPER_ADMIN")
 
                         // SDK client endpoints - require API key authentication
                         .requestMatchers(HttpMethod.GET, "/api/v1/feature-flags").authenticated()
@@ -37,16 +43,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/feature-flags/evaluate/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/feature-flags/event-stream").authenticated()
 
-                        // Admin endpoints - management operations (will be protected by admin auth in future)
-                        .requestMatchers(HttpMethod.POST, "/api/v1/feature-flags").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/feature-flags/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/feature-flags/page").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/feature-flags/cache/refresh").permitAll()
-
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                // JWT filter runs first for admin auth, then API key filter for SDK auth
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiKeyAuthenticationFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
 }
+

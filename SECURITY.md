@@ -186,9 +186,42 @@ curl -X DELETE http://localhost:8082/api/v1/api-keys/1
 6. **Revocation**: Immediately revoke compromised keys
 7. **HTTPS**: Always use HTTPS in production to protect API keys in transit
 
+## Admin Authentication
+
+### Quick Start
+
+**Login:**
+```bash
+curl -X POST http://localhost:8082/api/v1/admin/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123"}'
+```
+
+**Use JWT Token:**
+```bash
+curl -X POST http://localhost:8082/api/v1/feature-flags \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "new-feature", "enabled": true}'
+```
+
+### Default Admin User
+- Username: `admin`
+- Password: `admin123` (change immediately in production!)
+- Role: `SUPER_ADMIN`
+
+## Dual Authentication Architecture
+
+The system supports two authentication mechanisms:
+
+| Type | Method | Use Case | Endpoints |
+|------|--------|----------|-----------|
+| **API Key** | `X-API-Key` header | SDK clients | Read-only feature flag operations |
+| **JWT** | `Authorization: Bearer` | Admin users | Management and CRUD operations |
+
 ## Future Enhancements
 
-1. **Admin Authentication**: Add separate authentication for admin endpoints (JWT, OAuth2, etc.)
+1. **Refresh Tokens**: Long-lived tokens for token renewal
 2. **Rate Limiting**: Implement rate limiting per API key
 3. **Audit Logging**: Log all API key usage for security auditing
 4. **Key Scopes**: Add permission scopes to limit what each API key can access

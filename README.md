@@ -113,6 +113,21 @@ FeatureFlagClient client = DefaultFeatureFlagClient.builder().build();
 client.initialize();
 ```
 
+#### Admin Authentication (JWT)
+Admin users authenticate via JWT tokens with role-based access control.
+
+**Login:**
+```bash
+curl -X POST http://localhost:8082/api/v1/admin/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "admin123"}'
+```
+
+**Default Admin User:**
+- Username: `admin`
+- Password: `admin123` ⚠️ Change immediately!
+- Role: `SUPER_ADMIN`
+
 For detailed security documentation, see [SECURITY.md](SECURITY.md)
 
 ## License
