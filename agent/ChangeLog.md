@@ -2,6 +2,7 @@
 
 ## Done
 
+32d376f: refactor(core): align feature flag module with DDD
 
 ## To do
 1. Local cache for core module in local profile
