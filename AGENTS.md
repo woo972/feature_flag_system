@@ -1,7 +1,7 @@
 # AgentInstruction.md
 
 ## 1. Purpose
-Defines overall operating rules and behavior guidelines for Codex.
+Defines overall operating rules and behavior guidelines for AI Agent.
 
 ## 2. Core Principles
 - Fast feedback loop
@@ -12,16 +12,11 @@ Defines overall operating rules and behavior guidelines for Codex.
 ## 3. Reference Documents
 - [ProgrammingGuide.md](agent/ProgrammingGuide.md)
 - [PermissionPolicy.md](agent/PermissionPolicy.md)
-- [ToolsAndIntegrations.md](agent/ToolsAndIntegrations.md)
 - [TechStack.md](agent/TechStack.md)
-- [SystemArchitecture.md](agent/SystemArchitecture.md)
 - [ProjectStructure.md](agent/ProjectStructure.md)
-- [EnvironmentSetup.md](agent/EnvironmentSetup.md)
-- [DeploymentGuide.md](agent/DeploymentGuide.md)
 - [ChangeLog.md](agent/ChangeLog.md)
 
 ## 4. Update Policy
 - Whenever any referenced file changes, this document must be reviewed for alignment.
-- Do not add comment to the code if there is no explicit request.
-- Do commit any changes with summarised title and contents. Do not push to repository.
-- Update Done section of ChangeLog.md when any change is made. Format: <short-commit-hash>: <summary> 
+- Do commit with `Git` any changes with summarised title and contents. Do not push to repository.
+- Update Done section of `ChangeLog.md` when any change is made. Format: <short-commit-hash>: <summary> 

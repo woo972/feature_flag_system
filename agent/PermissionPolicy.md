@@ -1,7 +1,7 @@
 # PermissionPolicy.md
 
 ## 1. Purpose
-Define which commands and operations Codex is allowed to run.
+Define which commands and operations AI Agent is allowed to run.
 
 ## 2. Allowed Commands
 - `./gradlew clean build` – end-to-end build; also triggers frontend placeholders if present.

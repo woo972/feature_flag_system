@@ -5,7 +5,8 @@
 - Enforce consistent naming, indentation, and imports.
 
 ## 2. Comments
-- Explain **why**, not **what**.
+- Never add comment on code if there is no explicit request.
+- If it needed, explain **why**, not **what**.
 - Use docstrings for public functions and classes.
 
 ## 3. Testing
