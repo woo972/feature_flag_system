@@ -2,6 +2,7 @@
 
 ## Done
 
+20ebe6d: feat(core): implement local cache for local profile
 32d376f: refactor(core): align feature flag module with DDD
 
 ## To do
