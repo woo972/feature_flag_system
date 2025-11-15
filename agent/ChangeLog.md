@@ -5,7 +5,6 @@
 32d376f: refactor(core): align feature flag module with DDD
 
 ## To do
-1. Local cache for core module in local profile
 2. Real DB and Redis connection for core module
 3. Replace frontend with React
 4. Add Integration tests
@@ -18,4 +17,3 @@
 17. Support pre-defined targeting rule
 19. Add error page for input validation
 22. Add request for registration of admin process   
- 
