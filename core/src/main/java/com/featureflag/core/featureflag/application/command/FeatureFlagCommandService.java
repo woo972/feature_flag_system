@@ -4,6 +4,7 @@ import com.featureflag.core.featureflag.domain.event.FeatureFlagUpdatedEvent;
 import com.featureflag.core.featureflag.domain.model.FeatureFlag;
 import com.featureflag.core.featureflag.domain.model.TargetingRule;
 import com.featureflag.core.featureflag.domain.repository.FeatureFlagRepository;
+import com.featureflag.core.predefinedtargetingrule.application.PreDefinedTargetingRuleService;
 import com.featureflag.shared.api.RegisterFeatureFlagRequest;
 import com.featureflag.shared.api.targeting.TargetingRuleRequest;
 import com.featureflag.shared.exception.FeatureFlagNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,15 +22,31 @@ import java.util.Optional;
 @Service
 public class FeatureFlagCommandService {
     private final FeatureFlagRepository featureFlagRepository;
+    private final PreDefinedTargetingRuleService preDefinedTargetingRuleService;
     private final ApplicationEventPublisher publisher;
 
     @Transactional
     public FeatureFlag register(RegisterFeatureFlagRequest request) {
-        var targetingRules = Optional.ofNullable(request.getTargetingRules())
+        var targetingRules = new ArrayList<TargetingRule>();
+
+        Optional.ofNullable(request.getTargetingRules())
                 .orElseGet(List::of)
                 .stream()
                 .map(this::toDomainRule)
-                .toList();
+                .forEach(targetingRules::add);
+
+        Optional.ofNullable(request.getPreDefinedTargetingRuleIds())
+                .orElseGet(List::of)
+                .stream()
+                .map(preDefinedTargetingRuleService::findById)
+                .map(preDefinedRule -> new TargetingRule(
+                        null,
+                        preDefinedRule.name(),
+                        preDefinedRule.operator(),
+                        preDefinedRule.values()
+                ))
+                .forEach(targetingRules::add);
+
         var featureFlag = FeatureFlag.create(request.getName(), request.getDescription(), targetingRules);
         return featureFlagRepository.save(featureFlag);
     }

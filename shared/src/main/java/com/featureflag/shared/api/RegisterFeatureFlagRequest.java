@@ -3,6 +3,7 @@ package com.featureflag.shared.api;
 import com.featureflag.shared.api.targeting.TargetingRuleRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +26,6 @@ public class RegisterFeatureFlagRequest {
     private String description;
     @Valid
     private List<TargetingRuleRequest> targetingRules;
+    @Size(max = 50)
+    private List<@Positive Long> preDefinedTargetingRuleIds;
 }

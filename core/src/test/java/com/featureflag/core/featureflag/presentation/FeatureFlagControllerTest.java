@@ -2,6 +2,7 @@ package com.featureflag.core.featureflag.presentation;
 
 import com.featureflag.core.featureflag.application.command.FeatureFlagCommandService;
 import com.featureflag.core.featureflag.application.query.FeatureFlagQueryService;
+import com.featureflag.core.featureflag.presentation.controller.FeatureFlagController;
 import com.featureflag.core.featureflag.presentation.mapper.FeatureFlagResponseMapper;
 import com.featureflag.core.admin.infrastructure.security.JwtUtil;
 import com.featureflag.core.apikey.application.service.ApiKeyApplicationService;

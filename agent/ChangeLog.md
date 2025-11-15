@@ -15,6 +15,5 @@
 12. <high> TargetingRule Support when registration
 15. Provide custom annotation for featureflag client without spring dependencies
 16. <mid> Host should be injected from outside
-17. Support pre-defined targeting rule
 19. Add error page for input validation
 22. Add request for registration of admin process   
