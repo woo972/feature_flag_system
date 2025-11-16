@@ -2,6 +2,7 @@
 
 ## Done
 
+950f948: feat(admin): add UI support for pre-defined targeting rules
 99301ae: feat(core): add support for pre-defined targeting rules
 20ebe6d: feat(core): implement local cache for local profile
 32d376f: refactor(core): align feature flag module with DDD
