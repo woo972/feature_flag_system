@@ -19,7 +19,31 @@
             <input type="text" id="description" th:field="*{description}" class="form-control" />
         </div>
 
-        <h4 class="mb-3">타겟팅 규칙</h4>
+        <h4 class="mb-3">사전 정의 타겟팅 규칙</h4>
+        <div class="mb-4">
+            <div th:if="${preDefinedRules.isEmpty()}" class="alert alert-info">
+                사전 정의된 타겟팅 규칙이 없습니다.
+                <a th:href="@{/admin/pre-defined-targeting-rules/new}" class="alert-link">새 규칙 만들기</a>
+            </div>
+            <div th:if="${!preDefinedRules.isEmpty()}" class="border rounded p-3 bg-white">
+                <div class="form-text mb-2">사용할 사전 정의 규칙을 선택하세요 (선택사항)</div>
+                <div th:each="rule, ruleStat : ${preDefinedRules}" class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                           th:id="'predef-' + ${rule.id}"
+                           name="preDefinedTargetingRuleIds"
+                           th:value="${rule.id}">
+                    <label class="form-check-label" th:for="'predef-' + ${rule.id}">
+                        <strong th:text="${rule.name}">rule-name</strong>
+                        <span class="text-muted" th:text="' - ' + ${rule.description}"></span>
+                        <span class="badge bg-secondary" th:text="${rule.operator}">IN</span>
+                        <span class="text-muted" th:text="${#strings.listJoin(rule.values, ', ')}">values</span>
+                    </label>
+                </div>
+                <a th:href="@{/admin/pre-defined-targeting-rules}" class="btn btn-sm btn-outline-primary mt-2">규칙 관리</a>
+            </div>
+        </div>
+
+        <h4 class="mb-3">인라인 타겟팅 규칙</h4>
         <div id="rules-container"></div>
         <button type="button" class="btn btn-success mb-3" onclick="addRule()">+ 규칙 추가</button>
 

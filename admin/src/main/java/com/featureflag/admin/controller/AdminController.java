@@ -31,6 +31,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/admin")
 public class AdminController {
     private final AdminFeatureFlagService adminFeatureFlagService;
+    private final com.featureflag.admin.service.AdminPreDefinedTargetingRuleService preDefinedRuleService;
 
     private static final String ADMIN_VIEW_BASE_PATH = "featureflags";
 
@@ -44,6 +45,7 @@ public class AdminController {
     @GetMapping("/feature-flags/new")
     public String registerPage(Model model) {
         model.addAttribute("registerFeatureFlagRequest", RegisterFeatureFlagRequest.builder().build());
+        model.addAttribute("preDefinedRules", preDefinedRuleService.list());
         return ADMIN_VIEW_BASE_PATH + "/form";
     }
 

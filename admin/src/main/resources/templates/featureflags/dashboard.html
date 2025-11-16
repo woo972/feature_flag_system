@@ -13,7 +13,10 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1">Feature Flag Control Plane</span>
-        <a th:href="@{/admin/feature-flags/new}" class="btn btn-primary">+ 등록</a>
+        <div class="d-flex gap-2">
+            <a th:href="@{/admin/pre-defined-targeting-rules}" class="btn btn-outline-secondary">사전 정의 규칙</a>
+            <a th:href="@{/admin/feature-flags/new}" class="btn btn-primary">+ 등록</a>
+        </div>
     </div>
 </nav>
 

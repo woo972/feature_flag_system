@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사전 정의 타겟팅 규칙 목록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="bg-light text-dark">
+
+<!-- Header -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">사전 정의 타겟팅 규칙</span>
+        <div class="d-flex gap-2">
+            <a th:href="@{/admin}" class="btn btn-secondary">대시보드</a>
+            <a th:href="@{/admin/pre-defined-targeting-rules/new}" class="btn btn-primary">+ 규칙 생성</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Content Container -->
+<div class="container">
+    <div th:if="${Success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${Success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Table Section -->
+    <div th:if="${rulesPage.isEmpty()}" class="text-center text-muted py-5">
+        등록된 사전 정의 타겟팅 규칙이 없습니다.
+    </div>
+
+    <div th:if="${!rulesPage.isEmpty()}" class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">이름</th>
+                <th scope="col">설명</th>
+                <th scope="col">연산자</th>
+                <th scope="col">값</th>
+                <th scope="col">생성일</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="rule : ${rulesPage.content}"
+                th:onclick="'window.location.href=\'/admin/pre-defined-targeting-rules/' + ${rule.id} + '\''"
+                style="cursor: pointer;">
+                <td th:text="${rule.id}">1</td>
+                <td th:text="${rule.name}">rule-name</td>
+                <td th:text="${#strings.abbreviate(rule.description, 50)}">설명...</td>
+                <td th:text="${rule.operator}">IN</td>
+                <td th:text="${#strings.listJoin(rule.values, ', ')}">US, UK</td>
+                <td th:text="${#temporals.format(rule.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav th:if="${rulesPage.totalPages > 1}" class="mt-4 d-flex justify-content-center">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{'/admin/pre-defined-targeting-rules?page=0&size=' + ${pageSize}}">처음</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{'/admin/pre-defined-targeting-rules?page=' + ${currentPage - 1} + '&size=' + ${pageSize}}">이전</a>
+            </li>
+            <li th:each="i : ${#numbers.sequence(0, rulesPage.totalPages - 1)}"
+                th:if="${i >= currentPage - 2 and i <= currentPage + 2}"
+                th:classappend="${currentPage == i} ? 'active'" class="page-item">
+                <a class="page-link" th:href="@{'/admin/pre-defined-targeting-rules?page=' + ${i} + '&size=' + ${pageSize}}"
+                   th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage + 1 >= rulesPage.totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{'/admin/pre-defined-targeting-rules?page=' + ${currentPage + 1} + '&size=' + ${pageSize}}">다음</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage + 1 >= rulesPage.totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{'/admin/pre-defined-targeting-rules?page=' + ${rulesPage.totalPages - 1} + '&size=' + ${pageSize}}">마지막</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+</body>
+</html>
