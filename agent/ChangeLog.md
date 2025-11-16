@@ -2,13 +2,13 @@
 
 ## Done
 
+8bcf3ae: feat(core): configure H2 database for local profile
 950f948: feat(admin): add UI support for pre-defined targeting rules
 99301ae: feat(core): add support for pre-defined targeting rules
 20ebe6d: feat(core): implement local cache for local profile
 32d376f: refactor(core): align feature flag module with DDD
 
 ## To do
-2. Real DB and Redis connection for core module
 3. Replace frontend with React
 4. Add Integration tests
 6. Add SonarQube to check code quality
