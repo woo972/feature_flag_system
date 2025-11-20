@@ -8,7 +8,10 @@
       "Bash(core/src/main/java/com/featureflag/core/service/ApiKeyService.java )",
       "Bash(core/src/main/java/com/featureflag/core/controller/ApiKeyController.java )",
       "Bash(core/src/main/java/com/featureflag/core/dto/CreateApiKeyRequest.java )",
-      "Bash(core/src/main/java/com/featureflag/core/dto/ApiKeyResponse.java)"
+      "Bash(core/src/main/java/com/featureflag/core/dto/ApiKeyResponse.java)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []
