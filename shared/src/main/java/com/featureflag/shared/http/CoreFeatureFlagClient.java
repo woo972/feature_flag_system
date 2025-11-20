@@ -135,10 +135,10 @@ public class CoreFeatureFlagClient {
     }
 
     private Map<String, List<String>> toMultiValue(Map<String, String> headers) {
-        if (headers == null || headers.isEmpty()) {
-            return Map.of();
-        }
         Map<String, List<String>> multiValue = new HashMap<>();
+        if (headers == null || headers.isEmpty()) {
+            return multiValue;
+        }
         headers.forEach((key, value) -> {
             if (value != null) {
                 multiValue.put(key, List.of(value));
