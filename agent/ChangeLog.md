@@ -2,6 +2,7 @@
 
 ## Done
 
+abae2eb: fix: resolve H2 database and HTTP client issues for local profile
 8bcf3ae: feat(core): configure H2 database for local profile
 950f948: feat(admin): add UI support for pre-defined targeting rules
 99301ae: feat(core): add support for pre-defined targeting rules
