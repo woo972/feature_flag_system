@@ -1,5 +1,5 @@
 server:
-  port: 8081  # 기본 포트와 충돌을 피하기 위해 8081로 설정
+  port: ${SERVER_PORT:8081}  # 기본 포트와 충돌을 피하기 위해 8081로 설정
 
 spring:
   application:
@@ -8,7 +8,7 @@ spring:
 # Feature Flag SDK 설정
 feature-flag:
   api-key: "your-api-key-here"  # 실제 API 키로 교체 필요
-  api-url: "http://localhost:8080/api"  # Feature Flag 서버 주소
+  api-url: "${FEATURE_FLAG_API_URL:http://localhost:8080/api}"  # Feature Flag 서버 주소
 
 # 로깅 설정
 logging:

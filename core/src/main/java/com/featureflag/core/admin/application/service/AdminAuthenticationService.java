@@ -25,13 +25,18 @@ public class AdminAuthenticationService {
         Username username = Username.of(request.getUsername());
 
         AdminUser adminUser = adminUserRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", username.getValue());
+                    return new IllegalArgumentException("Invalid credentials");
+                });
 
         if (!adminUser.isEnabled()) {
+            log.error("User disabled: {}", username.getValue());
             throw new IllegalStateException("User account is disabled");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), adminUser.getPassword().getEncryptedValue())) {
+            log.error("Password mismatch for user: {}", username.getValue());
             throw new IllegalArgumentException("Invalid credentials");
         }
 
@@ -40,8 +45,7 @@ public class AdminAuthenticationService {
 
         String token = jwtUtil.generateToken(
                 adminUser.getUsername().getValue(),
-                adminUser.getRole().name()
-        );
+                adminUser.getRole().name());
 
         log.info("Admin user logged in: {}", adminUser.getUsername().getValue());
 

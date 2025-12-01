@@ -15,15 +15,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AdminController.class)
+@WebMvcTest(controllers = AdminController.class)
+@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false)
 class AdminControllerTest {
     @MockBean
     private AdminFeatureFlagService adminFeatureFlagService;
+
+    @MockBean
+    private com.featureflag.admin.service.AdminPreDefinedTargetingRuleService preDefinedRuleService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -37,7 +42,7 @@ class AdminControllerTest {
         var featureFlag = createFeatureFlag();
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
         Page<FeatureFlag> page = new PageImpl<>(List.of(featureFlag));
-        when(adminFeatureFlagService.list(pageable)).thenReturn(page);
+        when(adminFeatureFlagService.list(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/admin"))
                 .andExpect(model().attribute("featureFlagPage", page))
@@ -47,6 +52,7 @@ class AdminControllerTest {
     @DisplayName("returns register page")
     @Test
     public void returnsRegisterView() throws Exception {
+        when(preDefinedRuleService.list()).thenReturn(List.of());
         mockMvc.perform(get("/admin/feature-flags/new"))
                 .andExpect(view().name("featureflags/form"));
     }
@@ -60,13 +66,13 @@ class AdminControllerTest {
                 .targetingRules(List.of())
                 .build();
 
-        doNothing().when(adminFeatureFlagService).register(request);
+        doNothing().when(adminFeatureFlagService).register(any(RegisterFeatureFlagRequest.class));
 
         mockMvc.perform(post("/admin/feature-flags")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                        .andExpect(flash().attribute("Success", "Feature flag registered."))
-                        .andExpect(redirectedUrl("/admin"));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(flash().attribute("Success", "Feature flag registered."))
+                .andExpect(redirectedUrl("/admin"));
     }
 
     @DisplayName("returns feature-flag-detail page & model")
@@ -89,7 +95,7 @@ class AdminControllerTest {
         when(adminFeatureFlagService.on(id)).thenReturn(featureFlag);
 
         mockMvc.perform(post("/admin/feature-flags/" + id + "/on"))
-                .andExpect(redirectedUrl("/admin/feature-flags/"+id));
+                .andExpect(redirectedUrl("/admin/feature-flags/" + id));
     }
 
     @DisplayName("returns feature-flag-detail page & model with off")
@@ -100,7 +106,7 @@ class AdminControllerTest {
         when(adminFeatureFlagService.off(id)).thenReturn(featureFlag);
 
         mockMvc.perform(post("/admin/feature-flags/" + id + "/off"))
-                .andExpect(redirectedUrl("/admin/feature-flags/"+id));
+                .andExpect(redirectedUrl("/admin/feature-flags/" + id));
     }
 
     @DisplayName("returns feature-flag-detail page & model with archived")
@@ -111,10 +117,10 @@ class AdminControllerTest {
         when(adminFeatureFlagService.archive(id)).thenReturn(featureFlag);
 
         mockMvc.perform(post("/admin/feature-flags/" + id + "/archive"))
-                .andExpect(redirectedUrl("/admin/feature-flags/"+id));
+                .andExpect(redirectedUrl("/admin/feature-flags/" + id));
     }
 
-    private FeatureFlag createFeatureFlag(){
+    private FeatureFlag createFeatureFlag() {
         return FeatureFlag
                 .builder()
                 .id(1L)
@@ -125,7 +131,7 @@ class AdminControllerTest {
                 .build();
     }
 
-    private FeatureFlag createOffFeatureFlag(){
+    private FeatureFlag createOffFeatureFlag() {
         return FeatureFlag
                 .builder()
                 .id(1L)
@@ -136,7 +142,7 @@ class AdminControllerTest {
                 .build();
     }
 
-    private FeatureFlag createArchivedFeatureFlag(){
+    private FeatureFlag createArchivedFeatureFlag() {
         return FeatureFlag
                 .builder()
                 .id(1L)

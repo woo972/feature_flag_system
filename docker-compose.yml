@@ -13,6 +13,12 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:alpine
+    container_name: feature-flag-redis
+    ports:
+      - "6379:6379"
+
   core:
     build:
       context: .
@@ -45,25 +51,25 @@ services:
       - "8080:8080"
 
   sdk:
-    profiles: ["sdk"]
+    profiles: [ "sdk" ]
     build:
       context: .
       dockerfile: sdk/Dockerfile
     image: feature-flag/sdk:latest
     container_name: feature-flag-sdk
-    command: ["sleep", "infinity"]
+    command: [ "sleep", "infinity" ]
 
   shared:
-    profiles: ["shared"]
+    profiles: [ "shared" ]
     build:
       context: .
       dockerfile: shared/Dockerfile
     image: feature-flag/shared:latest
     container_name: feature-flag-shared
-    command: ["sleep", "infinity"]
+    command: [ "sleep", "infinity" ]
 
   tests:
-    profiles: ["tests"]
+    profiles: [ "tests" ]
     build:
       context: .
       dockerfile: Dockerfile.test
@@ -74,7 +80,7 @@ services:
     volumes:
       - ./build:/workspace/build
       - /var/run/docker.sock:/var/run/docker.sock
-    command: ["test"]
+    command: [ "test" ]
 
 volumes:
   postgres-data:

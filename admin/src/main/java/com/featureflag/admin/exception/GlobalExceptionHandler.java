@@ -15,7 +15,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FeatureFlagNotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public String handleFeatureFlagNotFoundException(HttpServletRequest request, FeatureFlagNotFoundException ex, Model model) {
+    public String handleFeatureFlagNotFoundException(HttpServletRequest request, FeatureFlagNotFoundException ex,
+            Model model) {
         log.error("FeatureFlagNotFoundException: {}", ex.getMessage());
 
         model.addAttribute("status", HttpStatus.NOT_FOUND.value());
@@ -37,7 +38,5 @@ public class GlobalExceptionHandler {
 
         return "error/error";
     }
-
-
 
 }

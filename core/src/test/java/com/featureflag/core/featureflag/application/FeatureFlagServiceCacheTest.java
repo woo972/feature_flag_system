@@ -27,7 +27,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {FeatureFlagQueryService.class, FeatureFlagCommandService.class})
+@SpringBootTest(classes = { FeatureFlagQueryService.class, FeatureFlagCommandService.class })
 @Import(TestCacheConfig.class)
 class FeatureFlagServiceCacheTest {
     @Autowired
@@ -41,6 +41,8 @@ class FeatureFlagServiceCacheTest {
     FeatureFlagRepository featureFlagRepository;
     @MockBean
     ApplicationEventPublisher publisher;
+    @MockBean
+    com.featureflag.core.predefinedtargetingrule.application.PreDefinedTargetingRuleService preDefinedTargetingRuleService;
 
     @BeforeEach
     void setup() {
@@ -130,6 +132,7 @@ class FeatureFlagServiceCacheTest {
 
     private FeatureFlag createFlag(long id, FeatureFlagStatus status, LocalDateTime archivedAt) {
         var now = LocalDateTime.now();
-        return new FeatureFlag(id, "feature-" + id, "description", status, Collections.emptyList(), now.minusDays(1), now, archivedAt);
+        return new FeatureFlag(id, "feature-" + id, "description", status, Collections.emptyList(), now.minusDays(1),
+                now, archivedAt);
     }
 }
