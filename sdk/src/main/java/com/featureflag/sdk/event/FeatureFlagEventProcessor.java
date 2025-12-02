@@ -1,6 +1,6 @@
 package com.featureflag.sdk.event;
 
-import java.util.*;
+import java.util.Map;
 
 public interface FeatureFlagEventProcessor extends AutoCloseable {
     void initialize();

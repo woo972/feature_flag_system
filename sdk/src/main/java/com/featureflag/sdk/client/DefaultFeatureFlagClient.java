@@ -1,15 +1,22 @@
 package com.featureflag.sdk.client;
 
-import com.featureflag.sdk.cache.*;
-import com.featureflag.sdk.config.*;
-import com.featureflag.sdk.datasource.*;
-import com.featureflag.sdk.scheduler.*;
-import com.featureflag.sdk.stream.*;
+import com.featureflag.sdk.cache.DefaultFeatureFlagLocalCache;
+import com.featureflag.sdk.cache.FeatureFlagCache;
+import com.featureflag.sdk.config.FeatureFlagProperty;
+import com.featureflag.sdk.datasource.DefaultFeatureFlagHttpDataSource;
+import com.featureflag.sdk.datasource.FeatureFlagDataSource;
+import com.featureflag.sdk.scheduler.DefaultFeatureFlagScheduler;
+import com.featureflag.sdk.scheduler.FeatureFlagScheduler;
+import com.featureflag.sdk.stream.DefaultFeatureFlagStreamListener;
+import com.featureflag.sdk.stream.FeatureFlagStreamListener;
 import com.featureflag.shared.http.CoreFeatureFlagClient;
-import com.featureflag.shared.model.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import java.util.*;
+import com.featureflag.shared.model.FeatureFlag;
+import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 public class DefaultFeatureFlagClient implements FeatureFlagClient {

@@ -6,7 +6,9 @@ import com.featureflag.sdk.scheduler.FeatureFlagScheduler;
 import com.featureflag.sdk.stream.FeatureFlagStreamListener;
 import com.featureflag.shared.model.FeatureFlag;
 import com.featureflag.shared.model.FeatureFlagStatus;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +18,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongConsumer;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultFeatureFlagClientTest {
     private static final AtomicLong idSequence = new AtomicLong(1);

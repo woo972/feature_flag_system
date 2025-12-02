@@ -1,7 +1,11 @@
 package com.featureflag.sample;
 
-import com.featureflag.sdk.client.*;
-import org.springframework.context.annotation.*;
+import com.featureflag.sdk.client.DefaultFeatureFlagClient;
+import com.featureflag.sdk.client.FeatureFlagClient;
+import com.featureflag.sdk.client.UpdateMode;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 @Configuration
 public class SampleFeatureFlagConfig {
