@@ -14,4 +14,3 @@ Defines overall operating rules and behavior guidelines for AI Agent.
 - [ProgrammingGuide.md](agent/ProgrammingGuide.md)
 - [TechStack.md](agent/TechStack.md)
 - [ProjectStructure.md](agent/ProjectStructure.md)
-- [ChangeLog.md](agent/ChangeLog.md)

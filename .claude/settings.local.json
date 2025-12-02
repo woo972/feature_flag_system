@@ -11,7 +11,9 @@
       "Bash(core/src/main/java/com/featureflag/core/dto/ApiKeyResponse.java)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

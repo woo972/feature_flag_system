@@ -39,51 +39,25 @@ Common utilities and models shared across modules.
 
 ### Code Quality Tools
 
-This project uses three linting tools to ensure code quality:
+This project uses JaCoCo for test coverage reporting:
 
-#### Checkstyle
-Checks for coding standards and style violations.
+#### Test Coverage
 ```bash
-# Run Checkstyle on all modules
-./gradlew checkstyleMain checkstyleTest
+# Run tests and generate coverage report
+./gradlew test jacocoTestReport
 
-# Run on specific module
-./gradlew :core:checkstyleMain
-```
-Reports are generated at: `build/reports/checkstyle/`
-
-#### PMD
-Detects code quality issues and potential bugs.
-```bash
-# Run PMD on all modules
-./gradlew pmdMain pmdTest
-
-# Run on specific module
-./gradlew :core:pmdMain
-```
-Reports are generated at: `build/reports/pmd/`
-
-#### SpotBugs
-Finds bugs through static analysis.
-```bash
-# Run SpotBugs on all modules
-./gradlew spotbugsMain spotbugsTest
-
-# Run on specific module
-./gradlew :core:spotbugsMain
-```
-Reports are generated at: `build/reports/spotbugs/`
-
-#### Run All Linters
-```bash
-# Run all linters at once
-./gradlew check
+# Coverage reports are generated at: build/reports/jacoco/test/html/index.html
 ```
 
-Configuration files:
-- Checkstyle: `config/checkstyle/checkstyle.xml`
-- PMD: `config/pmd/ruleset.xml`
-- SpotBugs: Configured in `build.gradle.kts`
+#### Run All Tests with Coverage
+```bash
+# Run tests (coverage reports are automatically generated)
+./gradlew test
+```
+
+Configuration:
+- JaCoCo: Configured in `build.gradle.kts`
+- Coverage reports show line coverage percentage per module
 
 ### Security
 

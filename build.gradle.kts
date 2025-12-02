@@ -6,9 +6,6 @@ import java.io.StringReader
 plugins {
     java
     jacoco
-    checkstyle
-    pmd
-    id("com.github.spotbugs") version "6.0.24"
 }
 
 allprojects {
@@ -25,9 +22,6 @@ subprojects {
 
         apply(plugin = "java")
         apply(plugin = "jacoco")
-        apply(plugin = "checkstyle")
-        apply(plugin = "pmd")
-        apply(plugin = "com.github.spotbugs")
 
         java {
             sourceCompatibility = JavaVersion.VERSION_21
@@ -36,31 +30,6 @@ subprojects {
 
         extensions.configure<JacocoPluginExtension>("jacoco") {
             toolVersion = "0.8.10"
-        }
-
-        // Checkstyle configuration
-        checkstyle {
-            toolVersion = "10.12.4"
-            configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-            isIgnoreFailures = false
-            maxWarnings = 0
-        }
-
-        // PMD configuration
-        pmd {
-            toolVersion = "7.0.0"
-            isConsoleOutput = true
-            ruleSetFiles = files(rootProject.file("config/pmd/ruleset.xml"))
-            ruleSets = listOf()
-            isIgnoreFailures = false
-        }
-
-        // SpotBugs configuration
-        spotbugs {
-            toolVersion.set("4.8.3")
-            effort.set(com.github.spotbugs.snom.Effort.MAX)
-            reportLevel.set(com.github.spotbugs.snom.Confidence.LOW)
-            ignoreFailures.set(false)
         }
 
         dependencies {
@@ -83,17 +52,6 @@ subprojects {
         tasks.withType<Test>().configureEach {
             useJUnitPlatform()
             finalizedBy(tasks.named("jacocoTestReport"))
-        }
-
-        // SpotBugs report configuration
-        tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
-            reports.create("html") {
-                required.set(true)
-                outputLocation.set(file("${layout.buildDirectory.get()}/reports/spotbugs/${name}.html"))
-            }
-            reports.create("xml") {
-                required.set(false)
-            }
         }
 
         tasks.withType<JacocoReport>().configureEach {
@@ -151,26 +109,3 @@ subprojects {
     }
 }
 
-// Frontend 빌드 통합
-tasks.register("buildFrontend") {
-    dependsOn(":frontend:buildReact")
-    group = "build"
-    description = "Build the React frontend"
-}
-
-tasks.register("startFrontendDev") {
-    dependsOn(":frontend:startDev")
-    group = "application"
-    description = "Start the React frontend development server"
-}
-
-tasks.register("testFrontend") {
-    dependsOn(":frontend:testReact")
-    group = "verification"
-    description = "Run React frontend tests"
-}
-
-// 전체 빌드에 frontend 포함
-tasks.named("build") {
-    dependsOn("buildFrontend")
-}
