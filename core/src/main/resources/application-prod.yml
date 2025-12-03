@@ -2,7 +2,17 @@ spring:
     config:
         activate:
             on-profile: prod
-
-app:
-    database:
-        host: ${DATABASE_HOST:postgres}
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:featureflag}
+        username: ${DATABASE_USERNAME:featureflag_user}
+        password: ${DATABASE_PASSWORD:featureflag_pass}
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+        hibernate:
+            ddl-auto: update
+        show-sql: false
+    data:
+        redis:
+            host: ${REDIS_HOST:localhost}
+            port: ${REDIS_PORT:6379}
