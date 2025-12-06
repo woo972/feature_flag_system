@@ -46,7 +46,7 @@ jobs:
       - name: Summarize JaCoCo coverage
         if: always()
         run: |
-          python <<'PY'
+          python3 <<'PY'
           import os
           from pathlib import Path
           import xml.etree.ElementTree as ET

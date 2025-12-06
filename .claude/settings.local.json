@@ -17,7 +17,8 @@
       "Bash(curl:*)",
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(gh run:*)"
     ],
     "deny": [],
     "ask": []
