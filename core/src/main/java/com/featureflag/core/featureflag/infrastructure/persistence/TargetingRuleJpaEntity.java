@@ -1,8 +1,10 @@
 package com.featureflag.core.featureflag.infrastructure.persistence;
 
 import com.featureflag.core.featureflag.domain.model.TargetingRule;
+import com.featureflag.core.repository.converter.ListToJsonConverter;
 import com.featureflag.shared.model.RuleOperator;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -13,8 +15,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,7 +37,7 @@ class TargetingRuleJpaEntity {
     private RuleOperator operator;
 
     @Column(name = "rule_values", nullable = false)
-    @JdbcTypeCode(SqlTypes.JSON)
+    @Convert(converter = ListToJsonConverter.class)
     private List<String> values;
 
     @Column(nullable = false)
